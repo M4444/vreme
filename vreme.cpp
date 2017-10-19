@@ -3,7 +3,7 @@
 #include <sstream>
 #include <iomanip>
 #include <stdio.h>
-#include <stdlib.h> 
+#include <stdlib.h>
 
 using namespace std;
 
@@ -255,15 +255,15 @@ void parse(string token)
 		return;
 	}
 	else if(token.compare("help") == 0) {
-		cout << "posible format eg. 4:45 = 4/45 = 4.75 = 4h + 45m" << endl;
-		cout << "posible operations: +, -" << endl;
+		cout << "possible format e.g. 4:45 = 4/45 = 4.75 = 4h + 45m" << endl;
+		cout << "possible operations: +, -" << endl;
 		return;
 	}
 
 	switch(state) {
 	case TIME:
 		if(Time::checkFormat(token) < 0) {
-			cout << "* Error: unknown format (posible format eg. 4:45 = 4/45 = 4.75 = 4h + 45m)" << endl;
+			cout << "* Error: unknown format (possible format e.g. 4:45 = 4/45 = 4.75 = 4h + 45m)" << endl;
 			state = OP;
 			return;
 		}
@@ -275,7 +275,7 @@ void parse(string token)
 		break;
 	case OP:
 		if (token.length() != 1 || !Time::checkOp(token[0])) {
-			cout << "* Error: unknown operation (posible operations: +, -)" << endl;
+			cout << "* Error: unknown operation (possible operations: +, -)" << endl;
 			state = OP;
 			return;
 		}
@@ -290,13 +290,6 @@ void parse(string token)
 
 int main()
 {
-	/*string mystr;
-
-	while (true) {
-		getline (cin, mystr);
-		cout << "prevous line: " << mystr << endl;
-	}*/
-
 	t = Time();
 	string token = string();
 	string subtoken = string();
@@ -306,28 +299,14 @@ int main()
 	i = 0;
 	t.setOp('+');
 	while (true) {
-		//for(std::string::size_type i = 0; i < str.size(); ++i) {
-		//	char c = str[i];
-
-		//	if(c == ' ' || c == '\t')
-		//		continue;
-		//	case(state)"
-		//	do_things_with(str[i]);
-		//}
 		cin >> token;
 		int low = 0;
 		for (int j = 0; j < token.length(); j++) {
-			/*if (j == (token.length() - 1)) {
-				subtoken = token.substr(low, j-(low-1));
-				if (subtoken.length() > 1 && Time::checkOp(subtoken[0])) {
-					cout << "last op: " << subtoken[0] << endl;
-					parse(subtoken.substr(0,1));
-					subtoken = subtoken.substr(1);
-				}
-				cout << "last substring: " << subtoken << endl;
-				parse(subtoken);
-			} else if (Time::checkOp(token[j])) {
-				subtoken = token.substr(low, j-low);
+			if (Time::checkOp(token[j]) || j == (token.length() - 1)) {
+				if (j == (token.length() - 1))
+					subtoken = token.substr(low);
+				else
+					subtoken = token.substr(low, j-low);
 				low = j;
 				if (subtoken.length() > 1 && Time::checkOp(subtoken[0])) {
 					//cout << "op: " << subtoken[0] << endl;
@@ -336,115 +315,8 @@ int main()
 				}
 				//cout << "substring: " << subtoken << endl;
 				parse(subtoken);
-			}*/
-
-			if (Time::checkOp(token[j]) || j == (token.length() - 1)) {
-				if (j == (token.length() - 1))
-					subtoken = token.substr(low);
-				else
-					subtoken = token.substr(low, j-low);
-				low = j;
-				if (subtoken.length() > 1 && Time::checkOp(subtoken[0])) {
-					cout << "op: " << subtoken[0] << endl;
-					parse(subtoken.substr(0,1));
-					subtoken = subtoken.substr(1);
-				}
-				cout << "substring: " << subtoken << endl;
-				parse(subtoken);
 			}
 		}
 
-		//if (token.length() > 1 && token.find('+') == npos && token.find('-') == npos)
-
-		// check for commands
-		/*if(token.compare("exit") == 0)
-			return 0;
-		else if(token.compare("clear") == 0) {
-			t.clearTime();
-			t.setOp('+');
-			cout << i++ << ") " << t << endl;
-			state = TIME;
-			continue;
-		}
-		else if(token.compare("help") == 0) {
-			cout << "posible format eg. 4:45 = 4/45 = 4.75 = 4h + 45m" << endl;
-			cout << "posible operations: +, -" << endl;
-			continue;
-		}
-
-		switch(state) {
-		case TIME:
-			if(Time::checkFormat(token) < 0) {
-				cout << "* Error: unknown format (posible format eg. 4:45 = 4/45 = 4.75 = 4h + 45m)" << endl;
-				state = OP;
-				continue;
-			}
-
-			t.doOp(token);
-
-			cout << i++ << ") " << t << endl;
-			state = OP;
-			break;
-		case OP:
-			if (token.length() != 1 || !Time::checkOp(token[0])) {
-				cout << "* Error: unknown operation (posible operations: +, -)" << endl;
-				state = OP;
-				continue;
-			}
-
-			t.setOp(token[0]);
-			// in there is no error add it
-
-			state = TIME;
-			break;
-		}*/
-
-	/*nextTime:
-		cin >> token;
-		if(token.compare("exit") == 0)
-			return 0;
-		if(token.compare("clear") == 0) {
-			t.clearTime();
-			t.setOp('+');
-			cout << i++ << ") " << t << endl;
-			goto nextTime;
-		}
-		if(token.compare("help") == 0) {
-			cout << "posible format eg. 4:45 = 4/45 = 4.75 = 4h + 45m" << endl;
-			cout << "posible operations: +, -" << endl;
-			goto nextTime;
-		}
-		if(Time::checkFormat(token) < 0) {
-			cout << "* Error: unknown format (posible format eg. 4:45 = 4/45 = 4.75 = 4h + 45m)" << endl;
-			goto operation;
-		}
-
-		t.doOp(token);
-
-		cout << i++ << ") " << t << endl;
-
-	operation:
-		cin >> token;
-		if(token.compare("exit") == 0)
-			return 0;
-		if(token.compare("clear") == 0) {
-			t.clearTime();
-			t.setOp('+');
-			cout << i++ << ") " << t << endl;
-			goto nextTime;
-		}
-		if(token.compare("help") == 0) {
-			cout << "posible format eg. 4:45 = 4/45 = 4.75 = 4h + 45m" << endl;
-			cout << "posible operations: +, -" << endl;
-			goto nextTime;
-		}
-		if (token.length() != 1 || !Time::checkOp(token[0])) {
-			cout << "* Error: unknown operation (posible operations: +, -)" << endl;
-			goto operation;
-		}
-
-		t.setOp(token[0]);
-		// in there is no error add it
-		*/
 	}
 }
