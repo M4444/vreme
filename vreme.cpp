@@ -283,7 +283,7 @@ int main()
 		cin >> token;
 		int low = 0;
 		for (int j = 0; j < token.length(); j++) {
-			if (Time::checkOp(token[j]) || j == (token.length() - 1)) {
+			if (j > 0 && Time::checkOp(token[j]) || j == (token.length() - 1)) {
 				if (j == (token.length() - 1))
 					subtoken = token.substr(low);
 				else
@@ -291,6 +291,7 @@ int main()
 				low = j;
 				if (subtoken.length() > 1 && Time::checkOp(subtoken[0])) {
 					//cout << "op: " << subtoken[0] << endl;
+					state = OP;
 					parse(subtoken.substr(0,1));
 					subtoken = subtoken.substr(1);
 				}
