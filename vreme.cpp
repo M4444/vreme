@@ -16,20 +16,7 @@ private:
 
 	char op;
 public:
-	Time()
-	{
-		h = 0;
-		m = 0;
-
-		op = 0;
-	}
-	Time(int hh, int mm)
-	{
-		h = hh;
-		m = mm;
-
-		op = 0;
-	}
+	Time(int hh = 0, int mm = 0) : h(hh), m(mm), op(0) {}
 
 	int getH() const
 	{
@@ -40,11 +27,6 @@ public:
 	{
 		return m;
 	}
-	// Time(int h, double m)
-	// {
-	// 	this.h = h;
-	// 	this.md = m;
-	// }
 
 	static int checkFormat(string time)
 	{
@@ -125,8 +107,7 @@ public:
 
 	static bool checkOp(char op)
 	{
-		switch(op)
-		{
+		switch(op) {
 		case '+':
 		case '-':
 			return true;
@@ -142,8 +123,7 @@ public:
 
 	Time &doOp(string time)
 	{
-		switch(op)
-		{
+		switch(op) {
 		case '+':
 			add(time);
 			break;
@@ -151,6 +131,7 @@ public:
 			sub(time);
 			break;
 		default:
+			// error
 			break;
 		}
 
@@ -168,6 +149,7 @@ public:
 
 		return *this;
 	}
+
 	Time &add(string time)
 	{
 		Time newTime = Time();
@@ -187,17 +169,16 @@ public:
 	Time &sub(int hh, int mm)
 	{
 		h -= hh;
-		if (m < mm)
-		{
+		if (m < mm) {
 			h--;
 			m = 60 - (mm - m);
-		}
-		else {
+		} else {
 			m -= mm;
 		}
 
 		return *this;
 	}
+
 	Time &sub(string time)
 	{
 		Time newTime = Time();
@@ -227,6 +208,7 @@ ostream &operator<<(ostream &os, const Time &obj)
 	os << obj.getH() << ':';
 	os << setfill ('0') << setw (2);
 	os << obj.getM();
+
 	return os;
 }
 
@@ -245,16 +227,15 @@ Time t;
 void parse(string token)
 {
 	// check for commands
-	if(token.compare("exit") == 0)
+	if (token.compare("exit") == 0)
 		exit(0);
-	else if(token.compare("clear") == 0) {
+	else if (token.compare("clear") == 0) {
 		t.clearTime();
 		t.setOp('+');
 		cout << i++ << ") " << t << endl;
 		state = TIME;
 		return;
-	}
-	else if(token.compare("help") == 0) {
+	} else if (token.compare("help") == 0) {
 		cout << "possible format e.g. 4:45 = 4/45 = 4.75 = 4h + 45m" << endl;
 		cout << "possible operations: +, -" << endl;
 		return;
@@ -262,7 +243,7 @@ void parse(string token)
 
 	switch(state) {
 	case TIME:
-		if(Time::checkFormat(token) < 0) {
+		if (Time::checkFormat(token) < 0) {
 			cout << "* Error: unknown format (possible format e.g. 4:45 = 4/45 = 4.75 = 4h + 45m)" << endl;
 			state = OP;
 			return;
