@@ -19,12 +19,29 @@ public:
 
 	int getH() const
 	{
-		return h;
+		if (!isNegative())
+			return h;
+		else
+			if (m == 0)
+				return -h;
+			else
+				return -h - 1;
 	}
 
 	int getM() const
 	{
-		return m;
+		if (!isNegative())
+			return m;
+		else
+			if (m == 0)
+				return m;
+			else
+				return 60 - m;
+	}
+
+	bool isNegative() const
+	{
+		return h < 0;
 	}
 
 	static int checkFormat(string time)
@@ -204,6 +221,8 @@ public:
 
 ostream &operator<<(ostream &os, const Time &obj)
 {
+	if (obj.isNegative())
+		os << '-';
 	os << setfill('0') << setw(2);
 	os << obj.getH() << ':';
 	os << setfill('0') << setw(2);
