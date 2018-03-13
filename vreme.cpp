@@ -204,9 +204,9 @@ public:
 
 ostream &operator<<(ostream &os, const Time &obj)
 {
-	os << setfill ('0') << setw (2);
+	os << setfill('0') << setw(2);
 	os << obj.getH() << ':';
-	os << setfill ('0') << setw (2);
+	os << setfill('0') << setw(2);
 	os << obj.getM();
 
 	return os;
