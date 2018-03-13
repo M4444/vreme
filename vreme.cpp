@@ -12,7 +12,6 @@ class Time
 private:
 	int h;
 	int m;
-	double md;
 
 	char op;
 public:
@@ -47,6 +46,7 @@ public:
 	int parseTime(string time)
 	{
 		int buff, ret = 0;
+		double md;
 		char c;
 		stringstream ss(time);
 
