@@ -181,6 +181,7 @@ public:
 	Time &operator+(const Time &t2)
 	{
 		add(t2.h, t2.m);
+		return *this;
 	}
 
 	Time &sub(int hh, int mm)
@@ -208,6 +209,7 @@ public:
 	Time &operator-(const Time &t2)
 	{
 		sub(t2.h, t2.m);
+		return *this;
 	}
 
 	// std::istream& operator>>(std::istream& is, T& obj)
