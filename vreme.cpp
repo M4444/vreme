@@ -256,16 +256,24 @@ void parse(string token)
 		cout << i++ << ") " << t << endl;
 		state = TIME;
 		return;
-	} else if (token.compare("help") == 0) {
-		cout << "possible format e.g. 4:45 = 4/45 = 4.75 = 4h + 45m" << endl;
-		cout << "possible operations: +, -" << endl;
+	} else if (token.compare("help") == 0 || token.compare("?") == 0) {
+		cout << "----------------------------------------------------" << endl;
+		cout << "Regular format: (+|-)? time ((+|-) time)*" << endl;
+		cout << "Example 9:16 + 7.5 - 10m" << endl;
+		cout << endl;
+		cout << "Possible time formats: 4:45 = 4/45 = 4.75 = 4h + 45m" << endl;
+		cout << "Possible operations: +, -" << endl;
+		cout << "clear 	- reset the time to 0:00" << endl;
+		cout << "help 	- prints this help menu" << endl;
+		cout << "exit 	- quit the program" << endl;
+		cout << "----------------------------------------------------" << endl;
 		return;
 	}
 
 	switch(state) {
 	case TIME:
 		if (Time::checkFormat(token) < 0) {
-			cout << "* Error: unknown format (possible format e.g. 4:45 = 4/45 = 4.75 = 4h + 45m)" << endl;
+			cout << "* Error: unknown format (Possible time formats: 4:45 = 4/45 = 4.75 = 4h + 45m)" << endl;
 			state = OP;
 			return;
 		}
@@ -277,7 +285,7 @@ void parse(string token)
 		break;
 	case OP:
 		if (token.length() != 1 || !Time::checkOp(token[0])) {
-			cout << "* Error: unknown operation (possible operations: +, -)" << endl;
+			cout << "* Error: unknown operation (Possible operations: +, -)" << endl;
 			state = OP;
 			return;
 		}
@@ -297,7 +305,7 @@ int main()
 	string subtoken = string();
 	state = TIME;
 
-	cout << "Time calculation:" << endl;
+	cout << "Time calculation (type 'help' for more info):" << endl;
 	i = 0;
 	t.setOp('+');
 	while (true) {
