@@ -245,6 +245,16 @@ STATE state;
 int i;
 Time t;
 
+std::ostream& BOLD_ON(std::ostream& os)
+{
+    return os << "\e[1m";
+}
+
+std::ostream& BOLD_OFF(std::ostream& os)
+{
+    return os << "\e[0m";
+}
+
 void parse(string token)
 {
 	// check for commands
@@ -256,16 +266,18 @@ void parse(string token)
 		cout << i++ << ") " << t << endl;
 		state = TIME;
 		return;
-	} else if (token.compare("help") == 0 || token.compare("?") == 0) {
+	} else if (token.compare("help") == 0) {
 		cout << "----------------------------------------------------" << endl;
-		cout << "Regular format: (+|-)? time ((+|-) time)*" << endl;
-		cout << "Example 9:16 + 7.5 - 10m" << endl;
+		cout << "Example command: " << BOLD_ON << "9:16 + 7.5 - 10m" << BOLD_OFF << endl;
+		cout << "Regular command format: (+|-)? time ((+|-) time)*" << endl;
 		cout << endl;
-		cout << "Possible time formats: 4:45 = 4/45 = 4.75 = 4h + 45m" << endl;
-		cout << "Possible operations: +, -" << endl;
-		cout << "clear 	- reset the time to 0:00" << endl;
-		cout << "help 	- prints this help menu" << endl;
-		cout << "exit 	- quit the program" << endl;
+		cout << "Possible time formats: " << BOLD_ON << "X:X, X/X, X.X, Xh, Xm" << BOLD_OFF << endl;
+		cout << "Example of equal time: 4:45 = 4/45 = 4.75 = 4h + 45m" << endl;
+		cout << "Possible operations: " << BOLD_ON << "+, -" << BOLD_OFF << endl;
+		cout << endl;
+		cout << BOLD_ON << "clear" << BOLD_OFF << "	- reset the time to 00:00" << endl;
+		cout << BOLD_ON << "help"  << BOLD_OFF << "	- print this help menu" << endl;
+		cout << BOLD_ON << "exit"  << BOLD_OFF << "	- quit the program" << endl;
 		cout << "----------------------------------------------------" << endl;
 		return;
 	}
