@@ -255,6 +255,19 @@ std::ostream& BOLD_OFF(std::ostream& os)
     return os << "\e[0m";
 }
 
+std::ostream& print_format_help(std::ostream& os)
+{
+	os << "Possible time formats: " << BOLD_ON << "X:X, X/X, X.X, Xh, Xm" << BOLD_OFF << endl;
+	os << "Example of equal time: 4:45 = 4/45 = 4.75 = 4h + 45m" << endl;
+	return os;
+}
+
+std::ostream& print_operation_help(std::ostream& os)
+{
+	os << "Possible operations: " << BOLD_ON << "+, -" << BOLD_OFF << endl;
+	return os;
+}
+
 void parse(string token)
 {
 	// check for commands
@@ -271,9 +284,8 @@ void parse(string token)
 		cout << "Example command: " << BOLD_ON << "9:16 + 7.5 - 10m" << BOLD_OFF << endl;
 		cout << "Regular command format: (+|-)? time ((+|-) time)*" << endl;
 		cout << endl;
-		cout << "Possible time formats: " << BOLD_ON << "X:X, X/X, X.X, Xh, Xm" << BOLD_OFF << endl;
-		cout << "Example of equal time: 4:45 = 4/45 = 4.75 = 4h + 45m" << endl;
-		cout << "Possible operations: " << BOLD_ON << "+, -" << BOLD_OFF << endl;
+		cout << print_format_help;
+		cout << print_operation_help;
 		cout << endl;
 		cout << BOLD_ON << "clear" << BOLD_OFF << "	- reset the time to 00:00" << endl;
 		cout << BOLD_ON << "help"  << BOLD_OFF << "	- print this help menu" << endl;
@@ -285,8 +297,9 @@ void parse(string token)
 	switch(state) {
 	case TIME:
 		if (Time::checkFormat(token) < 0) {
-			cout << "* Error: unknown format (Possible time formats: 4:45 = 4/45 = 4.75 = 4h + 45m)" << endl;
-			state = OP;
+			cout << "* Error: Unknown format" << endl;
+			//cout << "Error: Unknown format" << endl;
+			cout << print_format_help;
 			return;
 		}
 
@@ -297,8 +310,9 @@ void parse(string token)
 		break;
 	case OP:
 		if (token.length() != 1 || !Time::checkOp(token[0])) {
-			cout << "* Error: unknown operation (Possible operations: +, -)" << endl;
-			state = OP;
+			cout << "* Error: Unknown operation" << endl;
+			//cout << "Error: Unknown operation" << endl;
+			cout << print_operation_help;
 			return;
 		}
 
