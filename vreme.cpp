@@ -1,9 +1,6 @@
+#include <iomanip>
 #include <iostream>
 #include <string>
-#include <sstream>
-#include <iomanip>
-#include <stdio.h>
-#include <stdlib.h>
 
 using namespace std;
 
