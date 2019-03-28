@@ -119,7 +119,7 @@ public:
 			break;
 		}
 
-		return 1;
+		return ret;
 	}
 
 	static bool checkOp(char op)
@@ -234,11 +234,8 @@ ostream &operator<<(ostream &os, const Time &obj)
 }
 
 enum STATE {
-	START,
 	TIME,
-	OP,
-	EXIT,
-	CLEAR
+	OP
 };
 
 STATE state;
@@ -247,12 +244,12 @@ Time t;
 
 std::ostream& BOLD_ON(std::ostream& os)
 {
-    return os << "\e[1m";
+    return os << "\033[1m";
 }
 
 std::ostream& BOLD_OFF(std::ostream& os)
 {
-    return os << "\e[0m";
+    return os << "\033[0m";
 }
 
 std::ostream& print_format_help(std::ostream& os)
@@ -337,8 +334,8 @@ int main()
 	while (true) {
 		cin >> token;
 		int low = 0;
-		for (int j = 0; j < token.length(); j++) {
-			if (j > 0 && Time::checkOp(token[j]) || j == (token.length() - 1)) {
+		for (size_t j = 0; j < token.length(); j++) {
+			if ((j > 0 && Time::checkOp(token[j])) || j == (token.length() - 1)) {
 				if (j == (token.length() - 1))
 					subtoken = token.substr(low);
 				else
