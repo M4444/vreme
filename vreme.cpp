@@ -236,8 +236,8 @@ enum STATE {
 };
 
 STATE state;
-int i;
-Time t;
+int step_counter;
+Time time_state;
 
 struct Bold {
 	string bold_string;
@@ -269,9 +269,9 @@ void parse(string token)
 	if (token.compare("exit") == 0)
 		exit(0);
 	else if (token.compare("clear") == 0) {
-		t.clearTime();
-		t.setOp('+');
-		cout << i++ << ") " << t << endl;
+		time_state.clearTime();
+		time_state.setOp('+');
+		cout << step_counter++ << ") " << time_state << endl;
 		state = TIME;
 		return;
 	} else if (token.compare("help") == 0) {
@@ -299,9 +299,9 @@ void parse(string token)
 			return;
 		}
 
-		t.doOp(token);
+		time_state.doOp(token);
 
-		cout << i++ << ") " << t << endl;
+		cout << step_counter++ << ") " << time_state << endl;
 		state = OP;
 		break;
 	case OP:
@@ -312,7 +312,7 @@ void parse(string token)
 			return;
 		}
 
-		t.setOp(token[0]);
+		time_state.setOp(token[0]);
 		// in there is no error add it
 
 		state = TIME;
@@ -322,24 +322,24 @@ void parse(string token)
 
 int main()
 {
-	t = Time();
+	time_state = Time();
 	string token = string();
 	string subtoken = string();
 	state = TIME;
 
 	cout << "Time calculation (type 'help' for more info):" << endl;
-	i = 0;
-	t.setOp('+');
+	step_counter = 0;
+	time_state.setOp('+');
 	while (true) {
 		cin >> token;
 		int low = 0;
-		for (size_t j = 0; j < token.length(); j++) {
-			if ((j > 0 && Time::checkOp(token[j])) || j == (token.length() - 1)) {
-				if (j == (token.length() - 1))
+		for (size_t i = 0; i < token.length(); i++) {
+			if ((i > 0 && Time::checkOp(token[i])) || i == (token.length() - 1)) {
+				if (i == (token.length() - 1))
 					subtoken = token.substr(low);
 				else
-					subtoken = token.substr(low, j-low);
-				low = j;
+					subtoken = token.substr(low, i-low);
+				low = i;
 				if (subtoken.length() > 1 && Time::checkOp(subtoken[0])) {
 					//cout << "op: " << subtoken[0] << endl;
 					state = OP;
