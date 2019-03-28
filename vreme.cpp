@@ -239,26 +239,27 @@ STATE state;
 int i;
 Time t;
 
-std::ostream& BOLD_ON(std::ostream& os)
-{
-    return os << "\033[1m";
-}
+struct Bold {
+	string bold_string;
+	Bold(string str) : bold_string(str) {}
+	friend std::ostream& operator<<(ostream &os, const Bold &bold_stirng);
+};
 
-std::ostream& BOLD_OFF(std::ostream& os)
+std::ostream& operator<<(ostream &os, const Bold &b)
 {
-    return os << "\033[0m";
+    return os << "\033[1m" << b.bold_string << "\033[0m";
 }
 
 std::ostream& print_format_help(std::ostream& os)
 {
-	os << "Possible time formats: " << BOLD_ON << "X:X, X/X, X.X, Xh, Xm" << BOLD_OFF << endl;
+	os << "Possible time formats: " << Bold("X:X, X/X, X.X, Xh, Xm") << endl;
 	os << "Example of equal time: 4:45 = 4/45 = 4.75 = 4h + 45m" << endl;
 	return os;
 }
 
 std::ostream& print_operation_help(std::ostream& os)
 {
-	os << "Possible operations: " << BOLD_ON << "+, -" << BOLD_OFF << endl;
+	os << "Possible operations: " << Bold("+, -") << endl;
 	return os;
 }
 
@@ -275,15 +276,15 @@ void parse(string token)
 		return;
 	} else if (token.compare("help") == 0) {
 		cout << "----------------------------------------------------" << endl;
-		cout << "Example command: " << BOLD_ON << "9:16 + 7.5 - 10m" << BOLD_OFF << endl;
+		cout << "Example command: " << Bold("9:16 + 7.5 - 10m") << endl;
 		cout << "Regular command format: (+|-)? time ((+|-) time)*" << endl;
 		cout << endl;
 		cout << print_format_help;
 		cout << print_operation_help;
 		cout << endl;
-		cout << BOLD_ON << "clear" << BOLD_OFF << "	- reset the time to 00:00" << endl;
-		cout << BOLD_ON << "help"  << BOLD_OFF << "	- print this help menu" << endl;
-		cout << BOLD_ON << "exit"  << BOLD_OFF << "	- quit the program" << endl;
+		cout << Bold("clear") << "	- reset the time to 00:00" << endl;
+		cout << Bold("help") << "	- print this help menu" << endl;
+		cout << Bold("exit") << "	- quit the program" << endl;
 		cout << "----------------------------------------------------" << endl;
 		return;
 	}
