@@ -252,8 +252,8 @@ std::ostream& operator<<(ostream &os, const Bold &b)
 
 std::ostream& print_format_help(std::ostream& os)
 {
-	os << "Possible time formats: " << Bold("X:X, X/X, X.X, Xh, Xm") << endl;
-	os << "Example of equal time: 4:45 = 4/45 = 4.75 = 4h + 45m" << endl;
+	os << "Possible " << Bold("time") << " formats: " << Bold("X:X, X/X, X.X, Xh, Xm") << endl;
+	os << "Example of equal " << Bold("time") << ": 4:45 = 4/45 = 4.75 = 4h + 45m" << endl;
 	return os;
 }
 
@@ -277,7 +277,8 @@ void parse(string token)
 	} else if (token.compare("help") == 0) {
 		cout << "----------------------------------------------------" << endl;
 		cout << "Example command: " << Bold("9:16 + 7.5 - 10m") << endl;
-		cout << "Regular command format: (+|-)? time ((+|-) time)*" << endl;
+		cout << "Regular command format:"
+		     << " (+|-)? " << Bold("time") << " ((+|-) " << Bold("time") << ")*" << endl;
 		cout << endl;
 		cout << print_format_help;
 		cout << print_operation_help;
