@@ -57,12 +57,30 @@ public:
 		m = 0;
 	}
 
-	int parseTime(string time)
+	int parseTime(string time_str)
 	{
+		if (time_str.compare("now") == 0) {
+			time_t raw_time;
+			struct tm *time_info;
+
+			time(&raw_time);
+			time_info = localtime(&raw_time);
+			h = time_info->tm_hour;
+			m = time_info->tm_min;
+			// Round to the nearest minute
+			if (time_info->tm_sec > 30) {
+				if (++m > 59) {
+					h = m / 60;
+					m = m % 60;
+				}
+			}
+			return 1;
+		}
+
 		int buff, ret = 0;
 		double md;
 		char c;
-		stringstream ss(time);
+		stringstream ss(time_str);
 
 		ss >> buff;
 		ss >> c;
@@ -252,7 +270,8 @@ std::ostream& operator<<(ostream &os, const Bold &b)
 
 std::ostream& print_format_help(std::ostream& os)
 {
-	os << "Possible " << Bold("time") << " formats: " << Bold("X:X, X/X, X.X, Xh, Xm") << endl;
+	os << "Possible " << Bold("time") << " formats: "
+	   << Bold("now, X:X, X/X, X.X, Xh, Xm") << endl;
 	os << "Example of equal " << Bold("time") << ": 4:45 = 4/45 = 4.75 = 4h + 45m" << endl;
 	return os;
 }
