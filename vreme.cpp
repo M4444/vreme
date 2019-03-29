@@ -193,9 +193,9 @@ public:
 		return *this;
 	}
 
-	Time &operator+(const Time &t2)
+	Time &operator+(const Time &time)
 	{
-		add(t2.h, t2.m);
+		add(time.h, time.m);
 		return *this;
 	}
 
@@ -221,9 +221,9 @@ public:
 		return *this;
 	}
 
-	Time &operator-(const Time &t2)
+	Time &operator-(const Time &time)
 	{
-		sub(t2.h, t2.m);
+		sub(time.h, time.m);
 		return *this;
 	}
 
