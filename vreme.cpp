@@ -9,10 +9,9 @@ class Time
 private:
 	int h;
 	int m;
-
-	char op;
 public:
-	Time(int hh = 0, int mm = 0) : h(hh), m(mm), op(0) {}
+	Time(int hh = 0, int mm = 0) : h(hh), m(mm) {}
+	Time(string time) { parseTime(time); }
 
 	int getH() const
 	{
@@ -137,39 +136,6 @@ public:
 		return ret;
 	}
 
-	static bool checkOp(char op)
-	{
-		switch(op) {
-		case '+':
-		case '-':
-			return true;
-		default:
-			return false;
-		}
-	}
-
-	void setOp(char op)
-	{
-		this->op = op;
-	}
-
-	Time &doOp(string time)
-	{
-		switch(op) {
-		case '+':
-			add(time);
-			break;
-		case '-':
-			sub(time);
-			break;
-		default:
-			// error
-			break;
-		}
-
-		return *this;
-	}
-
 	Time &add(int hh, int mm)
 	{
 		h += hh;
@@ -193,9 +159,15 @@ public:
 		return *this;
 	}
 
-	Time &operator+(const Time &time)
+	Time operator+(const Time &time)
 	{
 		add(time.h, time.m);
+		return *this;
+	}
+
+	Time &operator+=(const Time &time)
+	{
+		*this = *this + time;
 		return *this;
 	}
 
@@ -221,9 +193,15 @@ public:
 		return *this;
 	}
 
-	Time &operator-(const Time &time)
+	Time operator-(const Time &time)
 	{
 		sub(time.h, time.m);
+		return *this;
+	}
+
+	Time &operator-=(const Time &time)
+	{
+		*this = *this - time;
 		return *this;
 	}
 
@@ -256,6 +234,33 @@ enum STATE {
 STATE state;
 int step_counter;
 Time time_state;
+char operation;
+
+bool checkOp(char op)
+{
+	switch(op) {
+	case '+':
+	case '-':
+		return true;
+	default:
+		return false;
+	}
+}
+
+void doOp(Time &time_state, string token)
+{
+	switch(operation) {
+	case '+':
+		time_state += Time(token);
+		break;
+	case '-':
+		time_state -= Time(token);
+		break;
+	default:
+		// error
+		break;
+	}
+}
 
 struct Bold {
 	string bold_string;
@@ -289,7 +294,7 @@ void parse(string token)
 		exit(0);
 	else if (token.compare("clear") == 0) {
 		time_state.clearTime();
-		time_state.setOp('+');
+		operation = '+';
 		cout << step_counter++ << ") " << time_state << endl;
 		state = TIME;
 		return;
@@ -318,20 +323,20 @@ void parse(string token)
 			return;
 		}
 
-		time_state.doOp(token);
+		doOp(time_state, token);
 
 		cout << step_counter++ << ") " << time_state << endl;
 		state = OP;
 		break;
 	case OP:
-		if (token.length() != 1 || !Time::checkOp(token[0])) {
+		if (token.length() != 1 || !checkOp(token[0])) {
 			cout << "* Error: Unknown operation" << endl;
 			//cout << "Error: Unknown operation" << endl;
 			cout << print_operation_help;
 			return;
 		}
 
-		time_state.setOp(token[0]);
+		operation = token[0];
 		// in there is no error add it
 
 		state = TIME;
@@ -341,26 +346,27 @@ void parse(string token)
 
 int main()
 {
+	state = TIME;
+	step_counter = 0;
 	time_state = Time();
+	operation = '+';
+
 	string token = string();
 	string subtoken = string();
-	state = TIME;
 
 	cout << "Time calculation (type 'help' for more info):" << endl;
-	step_counter = 0;
-	time_state.setOp('+');
 	while (true) {
 		cin >> token;
 		int low = 0;
 		for (size_t i = 0; i < token.length(); i++) {
-			if ((i > 0 && Time::checkOp(token[i])) || i == (token.length() - 1)) {
+			if ((i > 0 && checkOp(token[i])) || i == (token.length() - 1)) {
 				if (i == (token.length() - 1))
 					subtoken = token.substr(low);
 				else
 					subtoken = token.substr(low, i-low);
 				low = i;
-				if (subtoken.length() > 1 && Time::checkOp(subtoken[0])) {
-					//cout << "op: " << subtoken[0] << endl;
+				if (subtoken.length() > 1 && checkOp(subtoken[0])) {
+					//cout << "operation: " << subtoken[0] << endl;
 					state = OP;
 					parse(subtoken.substr(0,1));
 					subtoken = subtoken.substr(1);
