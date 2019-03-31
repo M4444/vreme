@@ -63,12 +63,14 @@ std::ostream& print_format_help(std::ostream& os)
 	os << "Possible " << Bold("time") << " formats: "
 	   << Bold("now, X:X, X/X, X.X, Xh, Xm") << endl;
 	os << "Example of equal " << Bold("time") << ": 4:45 = 4/45 = 4.75 = 4h + 45m" << endl;
+	cout << "* Try '" << Bold("help") << "' for more info" << endl;
 	return os;
 }
 
 std::ostream& print_operation_help(std::ostream& os)
 {
 	os << "Possible operations: " << Bold("+, -") << endl;
+	cout << "* Try '" << Bold("help") << "' for more info" << endl;
 	return os;
 }
 
@@ -139,7 +141,7 @@ int main()
 	string token = string();
 	string subtoken = string();
 
-	cout << "Time calculation (type 'help' for more info):" << endl;
+	cout << "Time calculation:" << endl;
 	while (true) {
 		cin >> token;
 		int low = 0;
