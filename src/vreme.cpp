@@ -144,6 +144,8 @@ int main()
 	cout << "Time calculation:" << endl;
 	while (true) {
 		cin >> token;
+		if (cin.eof())
+			return 0;
 		int low = 0;
 		for (size_t i = 0; i < token.length(); i++) {
 			if ((i > 0 && checkOp(token[i])) || i == (token.length() - 1)) {
