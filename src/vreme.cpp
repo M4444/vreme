@@ -4,12 +4,15 @@
  * SPDX-License-Identifier: MIT
  */
 
+#include <cstring>
 #include <iostream>
 #include <string>
 
 #include "Time.h"
 
 using namespace std;
+
+bool clean_enabled = false;
 
 enum STATE {
 	TIME,
@@ -104,9 +107,10 @@ void parse(string token)
 	switch(state) {
 	case TIME:
 		if (Time::checkFormat(token) < 0) {
-			cout << "* Error: Unknown format" << endl;
-			//cout << "Error: Unknown format" << endl;
-			cout << print_format_help;
+			if (!clean_enabled) {
+				cout << "* Error: Unknown format" << endl;
+				cout << print_format_help;
+			}
 			return;
 		}
 
@@ -117,9 +121,10 @@ void parse(string token)
 		break;
 	case OP:
 		if (token.length() != 1 || !checkOp(token[0])) {
-			cout << "* Error: Unknown operation" << endl;
-			//cout << "Error: Unknown operation" << endl;
-			cout << print_operation_help;
+			if (!clean_enabled) {
+				cout << "* Error: Unknown operation" << endl;
+				cout << print_operation_help;
+			}
 			return;
 		}
 
@@ -131,7 +136,7 @@ void parse(string token)
 	}
 }
 
-int main()
+int main(int argc, char *argv[])
 {
 	state = TIME;
 	step_counter = 0;
@@ -141,7 +146,17 @@ int main()
 	string token = string();
 	string subtoken = string();
 
-	cout << "Time calculation:" << endl;
+	if (argc > 1) {
+		for (int i = 1; i < argc; i++)
+			if (strcmp(argv[i], "--clean") == 0)
+				clean_enabled = true;
+			else {
+				cout << "Unknown argument: " << argv[i] << endl;
+				return -1;
+			}
+	}
+	if (!clean_enabled)
+		cout << "Time calculation:" << endl;
 	while (true) {
 		cin >> token;
 		if (cin.eof())
@@ -164,6 +179,5 @@ int main()
 				parse(subtoken);
 			}
 		}
-
 	}
 }
