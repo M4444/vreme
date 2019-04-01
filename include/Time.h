@@ -90,7 +90,7 @@ public:
 		ss >> buff;
 		ss >> c;
 
-		switch(c) {
+		switch (c) {
 		case ':':
 		case '/':
 			h = buff;

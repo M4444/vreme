@@ -26,7 +26,7 @@ char operation;
 
 bool checkOp(char op)
 {
-	switch(op) {
+	switch (op) {
 	case '+':
 	case '-':
 		return true;
@@ -37,7 +37,7 @@ bool checkOp(char op)
 
 void doOp(Time &time_state, string token)
 {
-	switch(operation) {
+	switch (operation) {
 	case '+':
 		time_state += Time(token);
 		break;
@@ -58,7 +58,7 @@ struct Bold {
 
 std::ostream& operator<<(ostream &os, const Bold &b)
 {
-    return os << "\033[1m" << b.bold_string << "\033[0m";
+	return os << "\033[1m" << b.bold_string << "\033[0m";
 }
 
 std::ostream& print_format_help(std::ostream& os)
@@ -97,14 +97,14 @@ void parse(string token)
 		cout << print_format_help;
 		cout << print_operation_help;
 		cout << endl;
-		cout << Bold("clear") << "	- reset the time to 00:00" << endl;
-		cout << Bold("help") << "	- print this help menu" << endl;
-		cout << Bold("exit") << "	- quit the program" << endl;
+		cout << Bold("clear") << "\t- reset the time to 00:00" << endl;
+		cout << Bold("help") << "\t- print this help menu" << endl;
+		cout << Bold("exit") << "\t- quit the program" << endl;
 		cout << "----------------------------------------------------" << endl;
 		return;
 	}
 
-	switch(state) {
+	switch (state) {
 	case TIME:
 		if (Time::checkFormat(token) < 0) {
 			if (!clean_enabled) {
@@ -129,7 +129,6 @@ void parse(string token)
 		}
 
 		operation = token[0];
-		// in there is no error add it
 
 		state = TIME;
 		break;
@@ -172,7 +171,7 @@ int main(int argc, char *argv[])
 				if (subtoken.length() > 1 && checkOp(subtoken[0])) {
 					//cout << "operation: " << subtoken[0] << endl;
 					state = OP;
-					parse(subtoken.substr(0,1));
+					parse(subtoken.substr(0, 1));
 					subtoken = subtoken.substr(1);
 				}
 				//cout << "substring: " << subtoken << endl;
