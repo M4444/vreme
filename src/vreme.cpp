@@ -35,33 +35,12 @@ bool checkOp(char op)
 	}
 }
 
-void doOp(Time &time_state, string token)
+inline string Bold(const string &text)
 {
-	switch (operation) {
-	case '+':
-		time_state += Time(token);
-		break;
-	case '-':
-		time_state -= Time(token);
-		break;
-	default:
-		// error
-		break;
-	}
+	return "\033[1m" + text + "\033[0m";
 }
 
-struct Bold {
-	string bold_string;
-	Bold(string str) : bold_string(str) {}
-	friend std::ostream& operator<<(ostream &os, const Bold &bold_stirng);
-};
-
-std::ostream& operator<<(ostream &os, const Bold &b)
-{
-	return os << "\033[1m" << b.bold_string << "\033[0m";
-}
-
-std::ostream& print_format_help(std::ostream& os)
+inline std::ostream& print_format_help(std::ostream& os)
 {
 	os << "Possible " << Bold("time") << " formats: "
 	   << Bold("now, X:X, X/X, X.X, Xh, Xm") << endl;
@@ -70,7 +49,7 @@ std::ostream& print_format_help(std::ostream& os)
 	return os;
 }
 
-std::ostream& print_operation_help(std::ostream& os)
+inline std::ostream& print_operation_help(std::ostream& os)
 {
 	os << "Possible operations: " << Bold("+, -") << endl;
 	cout << "* Try '" << Bold("help") << "' for more info" << endl;
@@ -114,7 +93,18 @@ void parse(string token)
 			return;
 		}
 
-		doOp(time_state, token);
+		switch (operation) {
+		case '+':
+			time_state += Time(token);
+			break;
+		case '-':
+			time_state -= Time(token);
+			break;
+		default:
+			// error
+			break;
+		}
+
 
 		cout << step_counter++ << ") " << time_state << endl;
 		state = OP;

@@ -13,11 +13,15 @@ using namespace std;
 class Time
 {
 private:
-	int h;
-	int m;
+	int h = 0;
+	int m = 0;
 public:
-	Time(int hh = 0, int mm = 0) : h(hh), m(mm) {}
-	Time(string time) { parseTime(time); }
+	Time() = default;
+
+	Time(string time)
+	{
+		parseTime(time);
+	}
 
 	int getH() const
 	{
@@ -49,11 +53,6 @@ public:
 	static int checkFormat(string time)
 	{
 		return Time().parseTime(time);
-	}
-
-	int setTime(string time)
-	{
-		return parseTime(time);
 	}
 
 	void clearTime()
@@ -142,32 +141,15 @@ public:
 		return ret;
 	}
 
-	Time &add(int hh, int mm)
+	Time operator+(const Time &time)
 	{
-		h += hh;
-		m += mm;
+		h += time.h;
+		m += time.m;
 		if (m >= 60) {
 			m = m % 60;
 			h++;
 		}
 
-		return *this;
-	}
-
-	Time &add(string time)
-	{
-		Time newTime = Time();
-		// if (parseTime(time, hh, mm) < 0)
-		// 	return // error
-		newTime.parseTime(time);
-		add(newTime.h, newTime.m);
-
-		return *this;
-	}
-
-	Time operator+(const Time &time)
-	{
-		add(time.h, time.m);
 		return *this;
 	}
 
@@ -177,31 +159,16 @@ public:
 		return *this;
 	}
 
-	Time &sub(int hh, int mm)
-	{
-		h -= hh;
-		if (m < mm) {
-			h--;
-			m = 60 - (mm - m);
-		} else {
-			m -= mm;
-		}
-
-		return *this;
-	}
-
-	Time &sub(string time)
-	{
-		Time newTime = Time();
-		newTime.parseTime(time);
-		sub(newTime.h, newTime.m);
-
-		return *this;
-	}
-
 	Time operator-(const Time &time)
 	{
-		sub(time.h, time.m);
+		h -= time.h;
+		if (m < time.m) {
+			h--;
+			m = 60 - (time.m - m);
+		} else {
+			m -= time.m;
+		}
+
 		return *this;
 	}
 
@@ -210,14 +177,6 @@ public:
 		*this = *this - time;
 		return *this;
 	}
-
-	// std::istream& operator>>(std::istream& is, T& obj)
-	// {
-	// 	// read obj from stream
-	//	if( /* T could not be constructed */ )
-	//	    is.setstate(std::ios::failbit);
-	//	return is;
-	// }
 };
 
 ostream &operator<<(ostream &os, const Time &obj)
