@@ -83,7 +83,7 @@ public:
 		}
 
 		int buff, ret = 0;
-		double md;
+		double md = 0;
 		char c;
 		stringstream ss(time_str);
 
