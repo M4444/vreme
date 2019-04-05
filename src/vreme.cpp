@@ -43,14 +43,14 @@ inline string Bold(const string &text)
 inline std::ostream& print_format_help(std::ostream& os)
 {
 	os << "Possible " << Bold("time") << " formats: "
-	   << Bold("now, X:X, X/X, X.X, Xh, Xm") << endl;
-	os << "Example of equal " << Bold("time") << ": 4:45 = 4/45 = 4.75 = 4h + 45m" << endl;
+	   << Bold("now, X:X, X/X, X.X, Xh, Xm") << '\n';
+	os << "Example of equal " << Bold("time") << ": 4:45 = 4/45 = 4.75 = 4h + 45m" << '\n';
 	return os;
 }
 
 inline std::ostream& print_operation_help(std::ostream& os)
 {
-	os << "Possible operations: " << Bold("+, -") << endl;
+	os << "Possible operations: " << Bold("+, -") << '\n';
 	return os;
 }
 
@@ -62,22 +62,22 @@ void parse(string token)
 	else if (token.compare("clear") == 0) {
 		time_state.clearTime();
 		operation = '+';
-		cout << step_counter++ << ") " << time_state << endl;
+		cout << step_counter++ << ") " << time_state << '\n';
 		state = TIME;
 		return;
 	} else if (token.compare("help") == 0) {
-		cout << "----------------------------------------------------" << endl;
-		cout << "Example command: " << Bold("9:16 + 7.5 - 10m") << endl;
+		cout << "----------------------------------------------------" << '\n';
+		cout << "Example command: " << Bold("9:16 + 7.5 - 10m") << '\n';
 		cout << "Regular command format:"
-		     << " (+|-)? " << Bold("time") << " ((+|-) " << Bold("time") << ")*" << endl;
-		cout << endl;
+		     << " (+|-)? " << Bold("time") << " ((+|-) " << Bold("time") << ")*" << '\n';
+		cout << '\n';
 		cout << print_format_help;
 		cout << print_operation_help;
-		cout << endl;
-		cout << Bold("clear") << "\t- reset the time to 00:00" << endl;
-		cout << Bold("help") << "\t- print this help menu" << endl;
-		cout << Bold("exit") << "\t- quit the program" << endl;
-		cout << "----------------------------------------------------" << endl;
+		cout << '\n';
+		cout << Bold("clear") << "\t- reset the time to 00:00" << '\n';
+		cout << Bold("help") << "\t- print this help menu" << '\n';
+		cout << Bold("exit") << "\t- quit the program" << '\n';
+		cout << "----------------------------------------------------" << '\n';
 		return;
 	}
 
@@ -85,9 +85,9 @@ void parse(string token)
 	case TIME:
 		if (Time::checkFormat(token) < 0) {
 			if (!clean_enabled) {
-				cout << "* Error: Unknown format" << endl;
+				cout << "* Error: Unknown format" << '\n';
 				cout << print_format_help;
-				cout << "* Try '" << Bold("help") << "' for more info" << endl;
+				cout << "* Try '" << Bold("help") << "' for more info" << '\n';
 			}
 			return;
 		}
@@ -104,16 +104,15 @@ void parse(string token)
 			break;
 		}
 
-
-		cout << step_counter++ << ") " << time_state << endl;
+		cout << step_counter++ << ") " << time_state << '\n';
 		state = OP;
 		break;
 	case OP:
 		if (token.length() != 1 || !checkOp(token[0])) {
 			if (!clean_enabled) {
-				cout << "* Error: Unknown operation" << endl;
+				cout << "* Error: Unknown operation" << '\n';
 				cout << print_operation_help;
-				cout << "* Try '" << Bold("help") << "' for more info" << endl;
+				cout << "* Try '" << Bold("help") << "' for more info" << '\n';
 			}
 			return;
 		}
@@ -140,12 +139,12 @@ int main(int argc, char *argv[])
 			if (strcmp(argv[i], "--clean") == 0)
 				clean_enabled = true;
 			else {
-				cout << "Unknown argument: " << argv[i] << endl;
+				cout << "Unknown argument: " << argv[i] << '\n';
 				return -1;
 			}
 	}
 	if (!clean_enabled)
-		cout << "Time calculation:" << endl;
+		cout << "Time calculation:" << '\n';
 	while (true) {
 		cin >> token;
 		if (cin.eof())
@@ -159,12 +158,12 @@ int main(int argc, char *argv[])
 					subtoken = token.substr(low, i-low);
 				low = i;
 				if (subtoken.length() > 1 && checkOp(subtoken[0])) {
-					//cout << "operation: " << subtoken[0] << endl;
+					//cout << "operation: " << subtoken[0] << '\n';
 					state = OP;
 					parse(subtoken.substr(0, 1));
 					subtoken = subtoken.substr(1);
 				}
-				//cout << "substring: " << subtoken << endl;
+				//cout << "substring: " << subtoken << '\n';
 				parse(subtoken);
 			}
 		}
