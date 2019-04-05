@@ -1,3 +1,9 @@
+/*
+ * Copyright (C) 2017-2019 Miloš Stojanović
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #include <ctime>
 #include <iomanip>
 #include <string>
