@@ -45,14 +45,12 @@ inline std::ostream& print_format_help(std::ostream& os)
 	os << "Possible " << Bold("time") << " formats: "
 	   << Bold("now, X:X, X/X, X.X, Xh, Xm") << endl;
 	os << "Example of equal " << Bold("time") << ": 4:45 = 4/45 = 4.75 = 4h + 45m" << endl;
-	cout << "* Try '" << Bold("help") << "' for more info" << endl;
 	return os;
 }
 
 inline std::ostream& print_operation_help(std::ostream& os)
 {
 	os << "Possible operations: " << Bold("+, -") << endl;
-	cout << "* Try '" << Bold("help") << "' for more info" << endl;
 	return os;
 }
 
@@ -89,6 +87,7 @@ void parse(string token)
 			if (!clean_enabled) {
 				cout << "* Error: Unknown format" << endl;
 				cout << print_format_help;
+				cout << "* Try '" << Bold("help") << "' for more info" << endl;
 			}
 			return;
 		}
@@ -114,6 +113,7 @@ void parse(string token)
 			if (!clean_enabled) {
 				cout << "* Error: Unknown operation" << endl;
 				cout << print_operation_help;
+				cout << "* Try '" << Bold("help") << "' for more info" << endl;
 			}
 			return;
 		}
