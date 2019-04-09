@@ -40,7 +40,7 @@ inline string Bold(const string &text)
 	return "\033[1m" + text + "\033[0m";
 }
 
-inline std::ostream& print_format_help(std::ostream& os)
+inline ostream& print_format_help(ostream& os)
 {
 	os << "Possible " << Bold("time") << " formats: "
 	   << Bold("now, X:X, X/X, X.X, Xh, Xm") << '\n';
@@ -48,7 +48,7 @@ inline std::ostream& print_format_help(std::ostream& os)
 	return os;
 }
 
-inline std::ostream& print_operation_help(std::ostream& os)
+inline ostream& print_operation_help(ostream& os)
 {
 	os << "Possible operations: " << Bold("+, -") << '\n';
 	return os;
