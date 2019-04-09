@@ -1,24 +1,12 @@
-SRC_DIR = src
-OBJ_DIR = obj
-INC_DIR = include
-
-TARGET = vreme
 CXX = g++
-CXXFLAGS = -Wall -g
-CPPFLAGS = -I $(INC_DIR)/
+CXXFLAGS = -g -Wall
 
-.PHONY: clean
+all: vreme
 
-SOURCES := $(wildcard $(SRC_DIR)/*.cpp)
-OBJECTS := $(SOURCES:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
+vreme: vreme.o
+	$(CXX) $(CXXFLAGS) -o vreme vreme.o
 
-$(TARGET): $(OBJECTS)
-	$(CXX) $(CXXFLAGS) $^ -o $@
-
-$(OBJECTS): $(SOURCES)
-	@mkdir -p $(OBJ_DIR)/
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+vreme.o: Time.h
 
 clean:
-	rm -rf $(OBJ_DIR)
-	rm -f $(TARGET)
+	rm -f vreme.o vreme
