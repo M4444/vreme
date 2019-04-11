@@ -83,7 +83,7 @@ void parse(string token)
 
 	switch (state) {
 	case TIME:
-		if (Time::checkFormat(token) < 0) {
+		if (!Time::checkFormat(token)) {
 			if (!clean_enabled) {
 				cout << "* Error: Unknown format" << '\n';
 				cout << print_format_help;

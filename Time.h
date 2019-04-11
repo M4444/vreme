@@ -50,7 +50,7 @@ public:
 		return h < 0;
 	}
 
-	static int checkFormat(string time)
+	static bool checkFormat(string time)
 	{
 		return Time().parseTime(time);
 	}
@@ -61,7 +61,7 @@ public:
 		m = 0;
 	}
 
-	int parseTime(string time_str)
+	bool parseTime(string time_str)
 	{
 		if (time_str.compare("now") == 0) {
 			time_t raw_time;
@@ -78,10 +78,10 @@ public:
 					m = m % 60;
 				}
 			}
-			return 1;
+			return true;
 		}
 
-		int buff, ret = 0;
+		int buff = 0;
 		double md = 0;
 		char c;
 		stringstream ss(time_str);
@@ -93,26 +93,18 @@ public:
 		case ':':
 		case '/':
 			h = buff;
-			if (h > 24) {
-				// printf("Warning: over 24h\n");
-				ret = 1;
-			}
 			ss >> m;
 			if (m > 59)
-				return -2;
+				return false;
 			break;
 		case '.':
 			h = buff;
-			if (h > 24) {
-				// printf("Warning: over 24h\n");
-				ret = 1;
-			}
 			ss >> c;
 			if (c < '0' || c > '9')
-				return -1;
+				return false;
 			ss >> md;
 			if (md > 9)
-				return -3;
+				return false;
 			else {
 				md += (c - '0') * 10;
 				m = md * 60 / 100;
@@ -120,25 +112,20 @@ public:
 			break;
 		case 'h':
 			h = buff;
-			if (h > 24)
-				ret = 1;
 			break;
 		case 'm':
 			m = buff;
 			if (m > 59) {
 				h = m / 60;
 				m = m % 60;
-				// printf("Warning: over 60m\n");
-				ret = 2;
 			}
 			break;
 		default:
-			// printf("* Error: unknown format\n");
-			return -1;
+			return false;
 			break;
 		}
 
-		return ret;
+		return true;
 	}
 
 	Time operator+(const Time &time)
