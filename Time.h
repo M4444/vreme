@@ -63,7 +63,7 @@ public:
 
 	bool parseTime(string time_str)
 	{
-		if (time_str.compare("now") == 0) {
+		if (time_str == "now") {
 			time_t raw_time;
 			struct tm *time_info;
 
@@ -78,51 +78,50 @@ public:
 					m = m % 60;
 				}
 			}
-			return true;
-		}
+		} else {
+			int buff = 0;
+			double md = 0;
+			char c;
+			stringstream ss(time_str);
 
-		int buff = 0;
-		double md = 0;
-		char c;
-		stringstream ss(time_str);
-
-		ss >> buff;
-		ss >> c;
-
-		switch (c) {
-		case ':':
-		case '/':
-			h = buff;
-			ss >> m;
-			if (m > 59)
-				return false;
-			break;
-		case '.':
-			h = buff;
+			ss >> buff;
 			ss >> c;
-			if (c < '0' || c > '9')
+
+			switch (c) {
+			case ':':
+			case '/':
+				h = buff;
+				ss >> m;
+				if (m > 59)
+					return false;
+				break;
+			case '.':
+				h = buff;
+				ss >> c;
+				if (c < '0' || c > '9')
+					return false;
+				ss >> md;
+				if (md > 9)
+					return false;
+				else {
+					md += (c - '0') * 10;
+					m = md * 60 / 100;
+				}
+				break;
+			case 'h':
+				h = buff;
+				break;
+			case 'm':
+				m = buff;
+				if (m > 59) {
+					h = m / 60;
+					m = m % 60;
+				}
+				break;
+			default:
 				return false;
-			ss >> md;
-			if (md > 9)
-				return false;
-			else {
-				md += (c - '0') * 10;
-				m = md * 60 / 100;
+				break;
 			}
-			break;
-		case 'h':
-			h = buff;
-			break;
-		case 'm':
-			m = buff;
-			if (m > 59) {
-				h = m / 60;
-				m = m % 60;
-			}
-			break;
-		default:
-			return false;
-			break;
 		}
 
 		return true;
