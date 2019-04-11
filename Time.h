@@ -13,7 +13,6 @@ using namespace std;
 class Time
 {
 private:
-	int h = 0;
 	int m = 0;
 public:
 	Time() = default;
@@ -25,29 +24,23 @@ public:
 
 	int getH() const
 	{
-		if (!isNegative())
-			return h;
+		if (m < 0)
+			return -m / 60;
 		else
-			if (m == 0)
-				return -h;
-			else
-				return -h - 1;
+			return m / 60;
 	}
 
 	int getM() const
 	{
-		if (!isNegative())
-			return m;
+		if (m < 0)
+			return -m % 60;
 		else
-			if (m == 0)
-				return m;
-			else
-				return 60 - m;
+			return m % 60;
 	}
 
 	bool isNegative() const
 	{
-		return h < 0;
+		return m < 0;
 	}
 
 	static bool checkFormat(string time)
@@ -57,7 +50,6 @@ public:
 
 	void clearTime()
 	{
-		h = 0;
 		m = 0;
 	}
 
@@ -69,15 +61,11 @@ public:
 
 			time(&raw_time);
 			time_info = localtime(&raw_time);
-			h = time_info->tm_hour;
-			m = time_info->tm_min;
+			m = 60 * time_info->tm_hour;
+			m += time_info->tm_min;
 			// Round to the nearest minute
-			if (time_info->tm_sec > 30) {
-				if (++m > 59) {
-					h = m / 60;
-					m = m % 60;
-				}
-			}
+			if (time_info->tm_sec > 30)
+				m++;
 		} else {
 			int buff = 0;
 			double md = 0;
@@ -90,13 +78,12 @@ public:
 			switch (c) {
 			case ':':
 			case '/':
-				h = buff;
 				ss >> m;
 				if (m > 59)
 					return false;
+				m += 60 * buff;
 				break;
 			case '.':
-				h = buff;
 				ss >> c;
 				if (c < '0' || c > '9')
 					return false;
@@ -107,16 +94,13 @@ public:
 					md += (c - '0') * 10;
 					m = md * 60 / 100;
 				}
+				m += 60 * buff;
 				break;
 			case 'h':
-				h = buff;
+				m = 60 * buff;
 				break;
 			case 'm':
 				m = buff;
-				if (m > 59) {
-					h = m / 60;
-					m = m % 60;
-				}
 				break;
 			default:
 				return false;
@@ -129,13 +113,7 @@ public:
 
 	Time operator+(const Time& time)
 	{
-		h += time.h;
 		m += time.m;
-		if (m >= 60) {
-			m = m % 60;
-			h++;
-		}
-
 		return *this;
 	}
 
@@ -147,14 +125,7 @@ public:
 
 	Time operator-(const Time& time)
 	{
-		h -= time.h;
-		if (m < time.m) {
-			h--;
-			m = 60 - (time.m - m);
-		} else {
-			m -= time.m;
-		}
-
+		m -= time.m;
 		return *this;
 	}
 
