@@ -8,5 +8,8 @@ vreme: vreme.o
 
 vreme.o: Time.h
 
+test: vreme
+	@./test.sh; /bin/true
+
 clean:
 	rm -f vreme.o vreme
