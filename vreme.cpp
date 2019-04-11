@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: MIT
  */
 
+#include <cstdlib>
 #include <cstring>
 #include <iostream>
 #include <string>
@@ -54,7 +55,7 @@ inline ostream& print_operation_help(ostream& os)
 	return os;
 }
 
-void parse(string token)
+int parse(string token)
 {
 	// check for commands
 	if (token.compare("exit") == 0)
@@ -64,7 +65,7 @@ void parse(string token)
 		operation = '+';
 		cout << step_counter++ << ") " << time_state << '\n';
 		state = TIME;
-		return;
+		return EXIT_SUCCESS;
 	} else if (token.compare("help") == 0) {
 		cout << "----------------------------------------------------" << '\n';
 		cout << "Example command: " << Bold("9:16 + 7.5 - 10m") << '\n';
@@ -78,7 +79,7 @@ void parse(string token)
 		cout << Bold("help") << "\t- print this help menu" << '\n';
 		cout << Bold("exit") << "\t- quit the program" << '\n';
 		cout << "----------------------------------------------------" << '\n';
-		return;
+		return EXIT_SUCCESS;
 	}
 
 	switch (state) {
@@ -89,7 +90,7 @@ void parse(string token)
 				cout << print_format_help;
 				cout << "* Try '" << Bold("help") << "' for more info" << '\n';
 			}
-			return;
+			return EXIT_FAILURE;
 		}
 
 		switch (operation) {
@@ -114,7 +115,7 @@ void parse(string token)
 				cout << print_operation_help;
 				cout << "* Try '" << Bold("help") << "' for more info" << '\n';
 			}
-			return;
+			return EXIT_FAILURE;
 		}
 
 		operation = token[0];
@@ -122,6 +123,7 @@ void parse(string token)
 		state = TIME;
 		break;
 	}
+	return EXIT_SUCCESS;
 }
 
 int main(int argc, char *argv[])
@@ -130,6 +132,8 @@ int main(int argc, char *argv[])
 	step_counter = 0;
 	time_state = Time();
 	operation = '+';
+
+	int exit_status = EXIT_SUCCESS;
 
 	string token = string();
 	string subtoken = string();
@@ -140,7 +144,7 @@ int main(int argc, char *argv[])
 				clean_enabled = true;
 			else {
 				cout << "Unknown argument: " << argv[i] << '\n';
-				return -1;
+				return EXIT_FAILURE;
 			}
 	}
 	if (!clean_enabled)
@@ -148,7 +152,7 @@ int main(int argc, char *argv[])
 	while (true) {
 		cin >> token;
 		if (cin.eof())
-			return 0;
+			return exit_status;
 		int low = 0;
 		for (size_t i = 0; i < token.length(); i++) {
 			if ((i > 0 && checkOp(token[i])) || i == (token.length() - 1)) {
@@ -160,11 +164,11 @@ int main(int argc, char *argv[])
 				if (subtoken.length() > 1 && checkOp(subtoken[0])) {
 					//cout << "operation: " << subtoken[0] << '\n';
 					state = OP;
-					parse(subtoken.substr(0, 1));
+					exit_status = parse(subtoken.substr(0, 1));
 					subtoken = subtoken.substr(1);
 				}
 				//cout << "substring: " << subtoken << '\n';
-				parse(subtoken);
+				exit_status = parse(subtoken);
 			}
 		}
 	}
