@@ -165,14 +165,14 @@ public:
 	}
 };
 
-ostream &operator<<(ostream &os, const Time &obj)
+ostream &operator<<(ostream &os, const Time &time)
 {
-	if (obj.isNegative())
+	if (time.isNegative())
 		os << '-';
-	os << setfill('0') << setw(2);
-	os << obj.getH() << ':';
-	os << setfill('0') << setw(2);
-	os << obj.getM();
+	os << setfill('0') << setw(2)
+	   << time.getH() << ':'
+	   << setfill('0') << setw(2)
+	   << time.getM();
 
 	return os;
 }
