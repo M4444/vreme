@@ -35,7 +35,7 @@ bool checkOp(char op)
 	}
 }
 
-inline string Bold(const string &text)
+inline string Bold(const string& text)
 {
 	return "\033[1m" + text + "\033[0m";
 }

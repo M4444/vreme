@@ -127,7 +127,7 @@ public:
 		return true;
 	}
 
-	Time operator+(const Time &time)
+	Time operator+(const Time& time)
 	{
 		h += time.h;
 		m += time.m;
@@ -139,13 +139,13 @@ public:
 		return *this;
 	}
 
-	Time &operator+=(const Time &time)
+	Time& operator+=(const Time& time)
 	{
 		*this = *this + time;
 		return *this;
 	}
 
-	Time operator-(const Time &time)
+	Time operator-(const Time& time)
 	{
 		h -= time.h;
 		if (m < time.m) {
@@ -158,14 +158,14 @@ public:
 		return *this;
 	}
 
-	Time &operator-=(const Time &time)
+	Time& operator-=(const Time& time)
 	{
 		*this = *this - time;
 		return *this;
 	}
 };
 
-ostream &operator<<(ostream &os, const Time &time)
+ostream& operator<<(ostream& os, const Time& time)
 {
 	if (time.isNegative())
 		os << '-';
