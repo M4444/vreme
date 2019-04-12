@@ -81,6 +81,10 @@ public:
 				ss >> m;
 				if (!ss || m > 59)
 					return false;
+				// Check for trailing characters
+				ss.get();
+				if (ss)
+					return false;
 				m += 60 * buff;
 				break;
 			case '.':
@@ -94,13 +98,25 @@ public:
 						return false;
 					md += c - '0';
 				}
+				// Check for a third character after .
+				ss.get();
+				if (ss)
+					return false;
 				m = md * 60 / 100;
 				m += 60 * buff;
 				break;
 			case 'h':
+				// Check for trailing characters
+				ss.get();
+				if (ss)
+					return false;
 				m = 60 * buff;
 				break;
 			case 'm':
+				// Check for trailing characters
+				ss.get();
+				if (ss)
+					return false;
 				m = buff;
 				break;
 			default:
