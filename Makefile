@@ -11,5 +11,8 @@ vreme.o: Time.h
 test: vreme
 	@./test.sh; /bin/true
 
+test-all: vreme
+	@./test.sh --all; /bin/true
+
 clean:
 	rm -f vreme.o vreme

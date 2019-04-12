@@ -3,13 +3,24 @@
 PASS_COUNT=0
 FAIL_COUNT=0
 
+PRINT_ALL=0
+
+function output
+{
+	if [ "$PRINT_ALL" -eq 1 ]; then
+		echo $@
+	fi
+}
+
 # $1 = expectation
 # ${@:2} = input
 function expect_any
 {
 	echo -e "${@:2}" | ./vreme &> /dev/null
 	if [ "$?" -eq "$1" ]; then
-		echo -e "[\e[32m PASS \e[39m] ${@:2}"
+		if [ "$PRINT_ALL" -eq 1 ]; then
+			echo -e "[\e[32m PASS \e[39m] ${@:2}"
+		fi
 		((PASS_COUNT++))
 	else
 		echo -e "[\e[31m FAIL \e[39m] ${@:2}"
@@ -29,8 +40,8 @@ function expect_fail
 
 function test_time_formats
 {
-	echo "Testing GOOD time formats:"
-	echo "--------------------------"
+	output "Testing GOOD time formats:"
+	output "--------------------------"
 	expect_success	""
 	expect_success	"0"
 	expect_success	"0h"
@@ -65,8 +76,8 @@ function test_time_formats
 	expect_success	".5"
 	expect_success	".50"
 	expect_success	"now"
-	echo "Testing BAD time formats:"
-	echo "-------------------------"
+	output "Testing BAD time formats:"
+	output "-------------------------"
 	expect_fail	"1"
 	expect_fail	"10"
 	expect_fail	"100"
@@ -110,28 +121,31 @@ function test_time_formats
 	expect_fail	"100.500"
 	expect_fail	".500"
 	expect_fail	"Now"
-	echo
+	output
 }
 
 function test_commands
 {
-	echo "Testing GOOD commands:"
-	echo "----------------------"
+	output "Testing GOOD commands:"
+	output "----------------------"
 	expect_success	"clear"
 	expect_success	"help"
 	expect_success	"exit"
-	echo "Testing BAD commands:"
-	echo "---------------------"
+	output "Testing BAD commands:"
+	output "---------------------"
 	expect_fail	"Clear"
 	expect_fail	"Help"
 	expect_fail	"Exit"
 	expect_fail	"quit"
 	expect_fail	"Quit"
-	echo
+	output
 }
 
 function run_tests
 {
+	if [[ "$1" == "--all" ]]; then
+		PRINT_ALL=1
+	fi
 	test_time_formats
 	test_commands
 
@@ -150,7 +164,7 @@ function run_tests
 	echo "$PERCENT% passing"
 }
 
-run_tests
+run_tests $@
 
 if [ "$FAIL_COUNT" -eq 0 ]; then
 	exit 0
