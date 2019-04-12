@@ -69,31 +69,32 @@ public:
 		} else {
 			int buff = 0;
 			double md = 0;
-			char c;
-			stringstream ss(time_str);
+			char c = '\0';
+			istringstream ss(time_str);
 
 			ss >> buff;
-			ss >> c;
-
-			switch (c) {
+			if (!ss || ss.eof())
+				return false;
+			switch (ss.get()) {
 			case ':':
 			case '/':
 				ss >> m;
-				if (m > 59)
+				if (!ss || m > 59)
 					return false;
 				m += 60 * buff;
 				break;
 			case '.':
 				ss >> c;
-				if (c < '0' || c > '9')
+				if (!ss || c < '0' || c > '9')
 					return false;
-				ss >> md;
-				if (md > 9)
-					return false;
-				else {
-					md += (c - '0') * 10;
-					m = md * 60 / 100;
+				md = (c - '0') * 10;
+				ss >> c;
+				if (!ss.eof()) {
+					if (c < '0' || c > '9')
+						return false;
+					md += c - '0';
 				}
+				m = md * 60 / 100;
 				m += 60 * buff;
 				break;
 			case 'h':
