@@ -70,12 +70,12 @@ public:
 		} else if (time_str == "0") {
 			m = 0;
 		} else {
-			int buff = 0;
+			int first_number = 0;
 			char c = '\0';
 			istringstream ss(time_str);
 
 			if (ss.peek() != '.') {
-				ss >> buff;
+				ss >> first_number;
 				if (!ss || ss.eof())
 					return false;
 			}
@@ -103,7 +103,7 @@ public:
 				ss.get();
 				if (ss)
 					return false;
-				m += 60 * buff;
+				m += 60 * first_number;
 				break;
 			case '.':
 				ss >> c;
@@ -121,21 +121,21 @@ public:
 				if (ss)
 					return false;
 				m = round(m * 60 / 100.0);
-				m += 60 * buff;
+				m += 60 * first_number;
 				break;
 			case 'h':
 				// Check for trailing characters
 				ss.get();
 				if (ss)
 					return false;
-				m = 60 * buff;
+				m = 60 * first_number;
 				break;
 			case 'm':
 				// Check for trailing characters
 				ss.get();
 				if (ss)
 					return false;
-				m = buff;
+				m = first_number;
 				break;
 			default:
 				return false;
