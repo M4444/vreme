@@ -54,12 +54,14 @@ function test_time_formats
 	expect_success	"100m"
 	expect_success	"0:0"
 	expect_success	"0:00"
+	expect_success	"0:01"
 	expect_success	"0:30"
 	expect_success	"1:30"
 	expect_success	"10:30"
 	expect_success	"100:30"
 	expect_success	"0/0"
 	expect_success	"0/00"
+	expect_success	"0/01"
 	expect_success	"0/30"
 	expect_success	"1/30"
 	expect_success	"10/30"
@@ -77,6 +79,12 @@ function test_time_formats
 	expect_success	".0"
 	expect_success	".5"
 	expect_success	".50"
+	expect_success	".01"
+	expect_success	".02"
+	expect_success	".11"
+	expect_success	".12"
+	expect_success	".98"
+	expect_success	".99"
 	expect_success	"now"
 	output "Testing BAD time formats:"
 	output "-------------------------"
@@ -220,6 +228,107 @@ function test_commands
 	output
 }
 
+function expect_equal
+{
+	RESULT=$(echo $1 | ./vreme --clean | cut -c4-)
+	if [[ "$RESULT" == "$2" ]]; then
+		if [ "$PRINT_ALL" -eq 1 ]; then
+			echo -e "[\e[32m PASS \e[39m] $1 => $2"
+		fi
+		((PASS_COUNT++))
+	else
+		echo -e "[\e[31m FAIL \e[39m] $1 => $2"
+		((FAIL_COUNT++))
+	fi
+}
+
+function test_now
+{
+	# Two controls are used because time could have changed between date
+	# getting the time and vreme getting it afterwards, however this also
+	# assumes that no more than 1 second passed between the two events.
+	CONTROL1=$(date +"%R %S")
+	RESULT=$(echo now | ./vreme --clean | cut -c4-)
+	CONTROL2=$(date +"%R %S")
+
+	SECONDS1=$(echo "$CONTROL1" | cut -d' ' -f2)
+	CONTROL1=$(echo "$CONTROL1" | cut -d' ' -f1)
+	SECONDS2=$(echo "$CONTROL2" | cut -d' ' -f2)
+	CONTROL2=$(echo "$CONTROL2" | cut -d' ' -f1)
+
+	if [ "$SECONDS1" -gt 30 ]; then
+		CONTROL1=$(echo "$CONTROL1+1m" | ./vreme --clean | tail -1 | cut -c4-)
+	fi
+	if [ "$SECONDS2" -gt 30 ]; then
+		CONTROL2=$(echo "$CONTROL2+1m" | ./vreme --clean | tail -1 | cut -c4-)
+	fi
+
+	if [[ "$RESULT" == "$CONTROL1" ]]; then
+		if [ "$PRINT_ALL" -eq 1 ]; then
+			echo -e "[\e[32m PASS \e[39m] now => $CONTROL1"
+		fi
+		((PASS_COUNT++))
+	elif [[ "$RESULT" == "$CONTROL2" ]]; then
+		if [ "$PRINT_ALL" -eq 1 ]; then
+			echo -e "[\e[32m PASS \e[39m] now => $CONTROL2"
+		fi
+		((PASS_COUNT++))
+	else
+		echo -e "[\e[31m FAIL \e[39m] now => $CONTROL1 or $CONTROL2"
+		((FAIL_COUNT++))
+	fi
+}
+
+function test_values
+{
+	output "Testing values"
+	output "--------------"
+	expect_equal	"0"		"00:00"
+	expect_equal	"0h"		"00:00"
+	expect_equal	"1h"		"01:00"
+	expect_equal	"10h"		"10:00"
+	expect_equal	"100h"		"100:00"
+	expect_equal	"0m"		"00:00"
+	expect_equal	"1m"		"00:01"
+	expect_equal	"10m"		"00:10"
+	expect_equal	"100m"		"01:40"
+	expect_equal	"0:0"		"00:00"
+	expect_equal	"0:00"		"00:00"
+	expect_equal	"0:01"		"00:01"
+	expect_equal	"0:30"		"00:30"
+	expect_equal	"1:30"		"01:30"
+	expect_equal	"10:30"		"10:30"
+	expect_equal	"100:30"	"100:30"
+	expect_equal	"0/0"		"00:00"
+	expect_equal	"0/00"		"00:00"
+	expect_equal	"0/01"		"00:01"
+	expect_equal	"0/30"		"00:30"
+	expect_equal	"1/30"		"01:30"
+	expect_equal	"10/30"		"10:30"
+	expect_equal	"100/30"	"100:30"
+	expect_equal	"0.0"		"00:00"
+	expect_equal	"0.5"		"00:30"
+	expect_equal	"1.5"		"01:30"
+	expect_equal	"10.5"		"10:30"
+	expect_equal	"100.5"		"100:30"
+	expect_equal	"0.00"		"00:00"
+	expect_equal	"0.50"		"00:30"
+	expect_equal	"1.50"		"01:30"
+	expect_equal	"10.50"		"10:30"
+	expect_equal	"100.50"	"100:30"
+	expect_equal	".0"		"00:00"
+	expect_equal	".5"		"00:30"
+	expect_equal	".50"		"00:30"
+	expect_equal	".01"		"00:01"
+	expect_equal	".02"		"00:01"
+	expect_equal	".11"		"00:07"
+	expect_equal	".12"		"00:07"
+	expect_equal	".98"		"00:59"
+	expect_equal	".99"		"00:59"
+	test_now
+	output
+}
+
 function run_tests
 {
 	if [[ "$1" == "--all" ]]; then
@@ -227,8 +336,11 @@ function run_tests
 	fi
 
 	echo "Starting testing"
+	# Syntactic tests
 	test_time_formats
 	test_commands
+	# Semantic tests
+	test_values
 
 	echo "Results:"
 	echo "--------"
