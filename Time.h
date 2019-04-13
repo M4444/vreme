@@ -78,10 +78,24 @@ public:
 			switch (ss.get()) {
 			case ':':
 			case '/':
-				ss >> m;
-				if (!ss || m > 59)
+				ss >> c;
+				if (!ss || c < '0' || c > '5')
 					return false;
-				// Check for trailing characters
+				m = (c - '0') * 10;
+				if (c != '0') {
+					ss >> c;
+					if (!ss || c < '0' || c > '9')
+						return false;
+					m += (c - '0');
+				} else {
+					ss >> c;
+					if (!ss.eof()) {
+						if (c < '0' || c > '9')
+							return false;
+						m += (c - '0');
+					}
+				}
+				// Check for a third character after : or /
 				ss.get();
 				if (ss)
 					return false;
