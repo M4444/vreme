@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: MIT
  */
 
+#include <cmath>
 #include <ctime>
 #include <iomanip>
 #include <string>
@@ -70,7 +71,6 @@ public:
 			m = 0;
 		} else {
 			int buff = 0;
-			double md = 0;
 			char c = '\0';
 			istringstream ss(time_str);
 
@@ -109,18 +109,18 @@ public:
 				ss >> c;
 				if (!ss || c < '0' || c > '9')
 					return false;
-				md = (c - '0') * 10;
+				m = (c - '0') * 10;
 				ss >> c;
 				if (!ss.eof()) {
 					if (c < '0' || c > '9')
 						return false;
-					md += c - '0';
+					m += c - '0';
 				}
 				// Check for a third character after .
 				ss.get();
 				if (ss)
 					return false;
-				m = md * 60 / 100;
+				m = round(m * 60 / 100.0);
 				m += 60 * buff;
 				break;
 			case 'h':
