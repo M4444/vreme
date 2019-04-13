@@ -66,15 +66,19 @@ public:
 			// Round to the nearest minute
 			if (time_info->tm_sec > 30)
 				m++;
+		} else if (time_str == "0") {
+			m = 0;
 		} else {
 			int buff = 0;
 			double md = 0;
 			char c = '\0';
 			istringstream ss(time_str);
 
-			ss >> buff;
-			if (!ss || ss.eof())
-				return false;
+			if (ss.peek() != '.') {
+				ss >> buff;
+				if (!ss || ss.eof())
+					return false;
+			}
 			switch (ss.get()) {
 			case ':':
 			case '/':
