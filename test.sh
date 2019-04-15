@@ -342,12 +342,18 @@ function run_tests
 	fi
 
 	echo "Starting testing"
-	# Syntactic tests
-	test_time_formats
-	test_commands
-	# Semantic tests
-	test_values
+	time (
+		# Syntactic tests
+		test_time_formats
+		test_commands
+		# Semantic tests
+		test_values
 
+		echo "Done"
+		echo
+		echo -n "Testing times:"
+	)
+	echo
 	echo "Results:"
 	echo "--------"
 	echo "PASS: $PASS_COUNT"
