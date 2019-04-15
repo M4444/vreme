@@ -24,6 +24,8 @@ function expect_any
 		((PASS_COUNT++))
 	else
 		echo -e "[\e[31m FAIL \e[39m] ${@:2}"
+		echo "Input:  \"${@:2}\" should be recognized as valid"
+		echo
 		((FAIL_COUNT++))
 	fi
 }
@@ -238,6 +240,8 @@ function expect_equal
 		((PASS_COUNT++))
 	else
 		echo -e "[\e[31m FAIL \e[39m] $1 => $2"
+		echo "Result:  $1 => $RESULT is incorrect"
+		echo
 		((FAIL_COUNT++))
 	fi
 }
