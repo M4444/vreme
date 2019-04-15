@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: MIT
  */
 
+#ifndef TIME_H
+#define TIME_H
+
 #include <cmath>
 #include <ctime>
 #include <iomanip>
@@ -44,7 +47,7 @@ public:
 		return m < 0;
 	}
 
-	static bool checkFormat(string time)
+	static bool isTime(string time)
 	{
 		return Time().parseTime(time);
 	}
@@ -182,3 +185,5 @@ ostream& operator<<(ostream& os, const Time& time)
 
 	return os;
 }
+
+#endif

@@ -6,7 +6,7 @@ all: vreme
 vreme: vreme.o
 	$(CXX) $(CXXFLAGS) -o vreme vreme.o
 
-vreme.o: Time.h
+vreme.o: Time.h Token.h
 
 test: vreme
 	@./test.sh; /bin/true

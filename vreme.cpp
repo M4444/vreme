@@ -7,27 +7,14 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <sstream>
 #include <string>
+#include <vector>
 
 #include "Time.h"
+#include "Token.h"
 
 using namespace std;
-
-enum STATE {
-	TIME,
-	OP
-};
-
-bool checkOp(char op)
-{
-	switch (op) {
-	case '+':
-	case '-':
-		return true;
-	default:
-		return false;
-	}
-}
 
 inline string Bold(const string& text)
 {
@@ -48,79 +35,176 @@ inline ostream& print_operation_help(ostream& os)
 	return os;
 }
 
-struct Full_state {
-	STATE state;
+bool isOp(char c)
+{
+	switch (c) {
+	case '+':
+	case '-':
+		return true;
+	default:
+		return false;
+	}
+}
+
+bool isOp(const string& token)
+{
+	if (token.length() != 1)
+		return false;
+	return isOp(token[0]);
+}
+
+bool isCommand(const string& token)
+{
+	if (token == "exit" ||
+	    token == "clear" ||
+	    token == "help")
+		return true;
+	else
+		return false;
+}
+
+TOKEN_TYPE getTokenType(string token)
+{
+	if (isOp(token))
+		return OP;
+	else if (isCommand(token))
+		return COMMAND;
+	else if (Time::isTime(token))
+		return TIME;
+	else
+		return NONE;
+}
+
+int insertAndCheckToken(vector<Token>& tokens, const string& token_string)
+{
+	TOKEN_TYPE type = getTokenType(token_string);
+	if (type != NONE) {
+		tokens.emplace_back(token_string, type);
+		return EXIT_SUCCESS;
+	} else {
+		cout << "* Error: Unknown format" << '\n';
+		cout << print_format_help;
+		cout << "* Try '" << Bold("help") << "' for more info" << '\n';
+		return EXIT_FAILURE;
+	}
+}
+
+int lex(vector<Token>& tokens, const string& token_bunch)
+{
+	string token_string;
+	size_t token_start = 0;
+	size_t token_length = 0;
+	for (size_t i = 0; i < token_bunch.length(); i++) {
+		if (isOp(token_bunch[i])) {
+			if (token_length > 0) {
+				token_string = token_bunch.substr(token_start, token_length);
+				if (insertAndCheckToken(tokens, token_string) == EXIT_FAILURE)
+					return EXIT_FAILURE;
+				token_start += token_length;
+				token_length = 0;
+			}
+
+			token_length++;
+			token_string = token_bunch.substr(token_start, token_length);
+			if (insertAndCheckToken(tokens, token_string) == EXIT_FAILURE)
+				return EXIT_FAILURE;
+			token_start += token_length;
+			token_length = 0;
+		} else {
+			token_length++;
+		}
+	}
+	if (token_start < token_bunch.length()) {
+		token_string = token_bunch.substr(token_start, token_length);
+		if (insertAndCheckToken(tokens, token_string) == EXIT_FAILURE)
+			return EXIT_FAILURE;
+	}
+
+	return EXIT_SUCCESS;
+}
+
+struct State {
+	TOKEN_TYPE expected_type;
 	int step_counter;
 	Time time;
 	char operation;
 };
 
-int parse(Full_state& full_state, string token, const bool clean_enabled)
+int parse(State& state, const Token& token, const bool clean_enabled)
 {
-	// check for commands
-	if (token.compare("exit") == 0)
-		exit(0);
-	else if (token.compare("clear") == 0) {
-		full_state.time.clearTime();
-		full_state.operation = '+';
-		cout << full_state.step_counter++ << ") " << full_state.time << '\n';
-		full_state.state = TIME;
-		return EXIT_SUCCESS;
-	} else if (token.compare("help") == 0) {
-		cout << "----------------------------------------------------" << '\n';
-		cout << "Example command: " << Bold("9:16 + 7.5 - 10m") << '\n';
-		cout << "Regular command format:"
-		     << " (+|-)? " << Bold("time") << " ((+|-) " << Bold("time") << ")*" << '\n';
-		cout << '\n';
-		cout << print_format_help;
-		cout << print_operation_help;
-		cout << '\n';
-		cout << Bold("clear") << "\t- reset the time to 00:00" << '\n';
-		cout << Bold("help") << "\t- print this help menu" << '\n';
-		cout << Bold("exit") << "\t- quit the program" << '\n';
-		cout << "----------------------------------------------------" << '\n';
-		return EXIT_SUCCESS;
-	}
-
-	switch (full_state.state) {
-	case TIME:
-		if (!Time::checkFormat(token)) {
-			if (!clean_enabled) {
-				cout << "* Error: Unknown format" << '\n';
-				cout << print_format_help;
-				cout << "* Try '" << Bold("help") << "' for more info" << '\n';
-			}
-			return EXIT_FAILURE;
+	switch (token.getType()) {
+	case COMMAND:
+		if (token.getStr() == "exit")
+			exit(EXIT_SUCCESS);
+		else if (token.getStr() == "clear") {
+			state.time.clearTime();
+			state.operation = '+';
+			cout << state.step_counter++ << ") " << state.time << '\n';
+			state.expected_type = TIME;
+		} else if (token.getStr() == "help") {
+			cout << "----------------------------------------------------" << '\n';
+			cout << "Example command: " << Bold("9:16 + 7.5 - 10m") << '\n';
+			cout << "Regular command format:"
+			     << " (+|-)? " << Bold("time") << " ((+|-) " << Bold("time") << ")*" << '\n';
+			cout << '\n';
+			cout << print_format_help;
+			cout << print_operation_help;
+			cout << '\n';
+			cout << Bold("clear") << "\t- reset the time to 00:00" << '\n';
+			cout << Bold("help") << "\t- print this help menu" << '\n';
+			cout << Bold("exit") << "\t- quit the program" << '\n';
+			cout << "----------------------------------------------------" << '\n';
 		}
-
-		switch (full_state.operation) {
-		case '+':
-			full_state.time += Time(token);
-			break;
-		case '-':
-			full_state.time -= Time(token);
-			break;
-		default:
-			// error
-			break;
-		}
-
-		cout << full_state.step_counter++ << ") " << full_state.time << '\n';
-		full_state.state = OP;
 		break;
-	case OP:
-		if (token.length() != 1 || !checkOp(token[0])) {
+	case TIME:
+		if (state.expected_type == OP) {
 			if (!clean_enabled) {
-				cout << "* Error: Unknown operation" << '\n';
+				cout << "* Error: Operation not specified" << '\n';
+				cout << "After a time an operation needs to be specified next" << '\n';
 				cout << print_operation_help;
 				cout << "* Try '" << Bold("help") << "' for more info" << '\n';
 			}
 			return EXIT_FAILURE;
+		} else {
+			switch (state.operation) {
+			case '+':
+				state.time += Time(token.getStr());
+				break;
+			case '-':
+				state.time -= Time(token.getStr());
+				break;
+			default:
+				// error
+				break;
+			}
+
+			cout << state.step_counter++ << ") " << state.time << '\n';
+			state.expected_type = OP;
 		}
+		break;
+	case OP:
+		if (state.expected_type == TIME) {
+			if (!clean_enabled) {
+				cout << "* Error: Time not specified" << '\n';
+				cout << "After an operation time needs to be specified next" << '\n';
+				cout << print_format_help;
+				cout << "* Try '" << Bold("help") << "' for more info" << '\n';
+			}
+			return EXIT_FAILURE;
+		} else {
+			state.operation = token.getStr()[0];
 
-		full_state.operation = token[0];
-
-		full_state.state = TIME;
+			state.expected_type = TIME;
+		}
+		break;
+	case NONE:
+		// Lexer handles this case so this should be unreachable
+		if (!clean_enabled) {
+			cout << "* Error: Unknown format" << '\n';
+			cout << print_format_help;
+			cout << "* Try '" << Bold("help") << "' for more info" << '\n';
+		}
+		return EXIT_FAILURE;
 		break;
 	}
 	return EXIT_SUCCESS;
@@ -140,39 +224,36 @@ int main(int argc, char *argv[])
 			}
 		}
 	}
+
 	if (!clean_enabled)
 		cout << "Time calculation:" << '\n';
 
 	int exit_status = EXIT_SUCCESS;
-	Full_state full_state;
-	full_state.state = TIME;
-	full_state.step_counter = 0;
-	full_state.time = Time();
-	full_state.operation = '+';
-
-	string token = string();
-	string subtoken = string();
+	State state;
+	state.expected_type = TIME;
+	state.step_counter = 0;
+	state.time = Time();
+	state.operation = '+';
+	// Iterate over user inputs (full lines)
 	while (true) {
-		cin >> token;
+		string line;
+		getline(cin, line);
 		if (cin.eof())
 			return exit_status;
-		int low = 0;
-		for (size_t i = 0; i < token.length(); i++) {
-			if ((i > 0 && checkOp(token[i])) || i == (token.length() - 1)) {
-				if (i == (token.length() - 1))
-					subtoken = token.substr(low);
-				else
-					subtoken = token.substr(low, i-low);
-				low = i;
-				if (subtoken.length() > 1 && checkOp(subtoken[0])) {
-					//cout << "operation: " << subtoken[0] << '\n';
-					full_state.state = OP;
-					exit_status = parse(full_state, subtoken.substr(0, 1), clean_enabled);
-					subtoken = subtoken.substr(1);
-				}
-				//cout << "substring: " << subtoken << '\n';
-				exit_status = parse(full_state, subtoken, clean_enabled);
-			}
+
+		exit_status = EXIT_SUCCESS;
+		istringstream ss(line);
+		vector<Token> tokens;
+		// Iterate over whitespace-separated strings
+		while (!ss.eof() && exit_status != EXIT_FAILURE) {
+			string token_group;
+			ss >> token_group;
+			exit_status = lex(tokens, token_group);
+		}
+		for (const Token& token : tokens) {
+			if (exit_status == EXIT_FAILURE)
+				break;
+			exit_status = parse(state, token, clean_enabled);
 		}
 	}
 }
