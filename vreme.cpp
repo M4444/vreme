@@ -13,17 +13,10 @@
 
 using namespace std;
 
-bool clean_enabled = false;
-
 enum STATE {
 	TIME,
 	OP
 };
-
-STATE state;
-int step_counter;
-Time time_state;
-char operation;
 
 bool checkOp(char op)
 {
@@ -55,16 +48,23 @@ inline ostream& print_operation_help(ostream& os)
 	return os;
 }
 
-int parse(string token)
+struct Full_state {
+	STATE state;
+	int step_counter;
+	Time time;
+	char operation;
+};
+
+int parse(Full_state& full_state, string token, const bool clean_enabled)
 {
 	// check for commands
 	if (token.compare("exit") == 0)
 		exit(0);
 	else if (token.compare("clear") == 0) {
-		time_state.clearTime();
-		operation = '+';
-		cout << step_counter++ << ") " << time_state << '\n';
-		state = TIME;
+		full_state.time.clearTime();
+		full_state.operation = '+';
+		cout << full_state.step_counter++ << ") " << full_state.time << '\n';
+		full_state.state = TIME;
 		return EXIT_SUCCESS;
 	} else if (token.compare("help") == 0) {
 		cout << "----------------------------------------------------" << '\n';
@@ -82,7 +82,7 @@ int parse(string token)
 		return EXIT_SUCCESS;
 	}
 
-	switch (state) {
+	switch (full_state.state) {
 	case TIME:
 		if (!Time::checkFormat(token)) {
 			if (!clean_enabled) {
@@ -93,20 +93,20 @@ int parse(string token)
 			return EXIT_FAILURE;
 		}
 
-		switch (operation) {
+		switch (full_state.operation) {
 		case '+':
-			time_state += Time(token);
+			full_state.time += Time(token);
 			break;
 		case '-':
-			time_state -= Time(token);
+			full_state.time -= Time(token);
 			break;
 		default:
 			// error
 			break;
 		}
 
-		cout << step_counter++ << ") " << time_state << '\n';
-		state = OP;
+		cout << full_state.step_counter++ << ") " << full_state.time << '\n';
+		full_state.state = OP;
 		break;
 	case OP:
 		if (token.length() != 1 || !checkOp(token[0])) {
@@ -118,9 +118,9 @@ int parse(string token)
 			return EXIT_FAILURE;
 		}
 
-		operation = token[0];
+		full_state.operation = token[0];
 
-		state = TIME;
+		full_state.state = TIME;
 		break;
 	}
 	return EXIT_SUCCESS;
@@ -128,15 +128,7 @@ int parse(string token)
 
 int main(int argc, char *argv[])
 {
-	state = TIME;
-	step_counter = 0;
-	time_state = Time();
-	operation = '+';
-
-	int exit_status = EXIT_SUCCESS;
-
-	string token = string();
-	string subtoken = string();
+	bool clean_enabled = false;
 
 	if (argc > 1) {
 		for (int i = 1; i < argc; i++) {
@@ -150,6 +142,16 @@ int main(int argc, char *argv[])
 	}
 	if (!clean_enabled)
 		cout << "Time calculation:" << '\n';
+
+	int exit_status = EXIT_SUCCESS;
+	Full_state full_state;
+	full_state.state = TIME;
+	full_state.step_counter = 0;
+	full_state.time = Time();
+	full_state.operation = '+';
+
+	string token = string();
+	string subtoken = string();
 	while (true) {
 		cin >> token;
 		if (cin.eof())
@@ -164,12 +166,12 @@ int main(int argc, char *argv[])
 				low = i;
 				if (subtoken.length() > 1 && checkOp(subtoken[0])) {
 					//cout << "operation: " << subtoken[0] << '\n';
-					state = OP;
-					exit_status = parse(subtoken.substr(0, 1));
+					full_state.state = OP;
+					exit_status = parse(full_state, subtoken.substr(0, 1), clean_enabled);
 					subtoken = subtoken.substr(1);
 				}
 				//cout << "substring: " << subtoken << '\n';
-				exit_status = parse(subtoken);
+				exit_status = parse(full_state, subtoken, clean_enabled);
 			}
 		}
 	}
