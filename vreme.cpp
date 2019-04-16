@@ -139,13 +139,14 @@ int main(int argc, char *argv[])
 	string subtoken = string();
 
 	if (argc > 1) {
-		for (int i = 1; i < argc; i++)
-			if (strcmp(argv[i], "--clean") == 0)
+		for (int i = 1; i < argc; i++) {
+			if (strcmp(argv[i], "--clean") == 0) {
 				clean_enabled = true;
-			else {
+			} else {
 				cout << "Unknown argument: " << argv[i] << '\n';
 				return EXIT_FAILURE;
 			}
+		}
 	}
 	if (!clean_enabled)
 		cout << "Time calculation:" << '\n';
