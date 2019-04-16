@@ -249,8 +249,9 @@ function expect_equal
 function test_now
 {
 	# Two controls are used because time could have changed between date
-	# getting the time and vreme getting it afterwards, however this also
-	# assumes that no more than 1 second passed between the two events.
+	# acquiring the time and vreme acquiring it afterwards. This test also
+	# implicitly assumes that no more than 30 seconds will pass between the
+	# first and the second date acquiring the time.
 	CONTROL1=$(date +"%R %S")
 	RESULT=$(echo now | ./vreme --clean | cut -c4-)
 	CONTROL2=$(date +"%R %S")
@@ -260,6 +261,7 @@ function test_now
 	SECONDS2=$(echo "$CONTROL2" | cut -d' ' -f2)
 	CONTROL2=$(echo "$CONTROL2" | cut -d' ' -f1)
 
+	# Assumes adding 1 minute works in vreme
 	if [ "$SECONDS1" -gt 30 ]; then
 		CONTROL1=$(echo "$CONTROL1+1m" | ./vreme --clean | tail -1 | cut -c4-)
 	fi
