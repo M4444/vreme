@@ -18,7 +18,7 @@
 
 using namespace std;
 
-bool isOp(char c)
+bool isOp(const char c)
 {
 	switch (c) {
 	case '+':
@@ -27,13 +27,6 @@ bool isOp(char c)
 	default:
 		return false;
 	}
-}
-
-bool isOp(const string& token)
-{
-	if (token.length() != 1)
-		return false;
-	return isOp(token[0]);
 }
 
 bool isCommand(const string& token)
@@ -48,7 +41,7 @@ bool isCommand(const string& token)
 
 TOKEN_TYPE getTokenType(string token)
 {
-	if (isOp(token))
+	if (isOp(token[0]))
 		return OP;
 	else if (isCommand(token))
 		return COMMAND;
@@ -58,50 +51,35 @@ TOKEN_TYPE getTokenType(string token)
 		return NONE;
 }
 
-int insertAndCheckToken(vector<Token>& tokens, const string& token_string)
-{
-	TOKEN_TYPE type = getTokenType(token_string);
-	if (type != NONE) {
-		tokens.emplace_back(token_string, type);
-		return EXIT_SUCCESS;
-	} else {
-		error_output << "* Error: Unknown format" << '\n';
-		error_output << print_format_help;
-		error_output << "* Try '" << Bold("help") << "' for more info" << '\n';
-		return EXIT_FAILURE;
-	}
-}
-
-int lex(vector<Token>& tokens, const string& token_bunch)
+int lex(vector<Token>& tokens, const char token_group[])
 {
 	string token_string;
-	size_t token_start = 0;
+	const char *token_start = token_group;
 	size_t token_length = 0;
-	for (size_t i = 0; i < token_bunch.length(); i++) {
-		if (isOp(token_bunch[i])) {
-			if (token_length > 0) {
-				token_string = token_bunch.substr(token_start, token_length);
-				if (insertAndCheckToken(tokens, token_string) == EXIT_FAILURE)
-					return EXIT_FAILURE;
-				token_start += token_length;
-				token_length = 0;
-			}
+	bool op_encountered = false;
 
-			token_length++;
-			token_string = token_bunch.substr(token_start, token_length);
-			if (insertAndCheckToken(tokens, token_string) == EXIT_FAILURE)
-				return EXIT_FAILURE;
+	if (!token_group)
+		return EXIT_FAILURE;
+	do {
+		if (isOp(*token_group) || op_encountered || *token_group == '\0') {
+			op_encountered = isOp(*token_group);
+			if (token_length > 0) {
+				token_string = string(token_start, token_length);
+				TOKEN_TYPE type = getTokenType(token_string);
+				if (type != NONE) {
+					tokens.emplace_back(token_string, type);
+				} else {
+					error_output << "* Error: Unknown format" << '\n';
+					error_output << print_format_help;
+					error_output << "* Try '" << Bold("help") << "' for more info" << '\n';
+					return EXIT_FAILURE;
+				}
+			}
 			token_start += token_length;
 			token_length = 0;
-		} else {
-			token_length++;
 		}
-	}
-	if (token_start < token_bunch.length()) {
-		token_string = token_bunch.substr(token_start, token_length);
-		if (insertAndCheckToken(tokens, token_string) == EXIT_FAILURE)
-			return EXIT_FAILURE;
-	}
+		token_length++;
+	} while (*token_group++);
 
 	return EXIT_SUCCESS;
 }
@@ -142,7 +120,7 @@ int main(int argc, char *argv[])
 		while (!ss.eof() && exit_status != EXIT_FAILURE) {
 			string token_group;
 			ss >> token_group;
-			exit_status = lex(tokens, token_group);
+			exit_status = lex(tokens, token_group.c_str());
 		}
 		for (const Token& token : tokens) {
 			if (lex_enabled) {
