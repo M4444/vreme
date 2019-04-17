@@ -213,11 +213,14 @@ int parse(State& state, const Token& token, const bool clean_enabled)
 int main(int argc, char *argv[])
 {
 	bool clean_enabled = false;
+	bool lex_enabled = false;
 
 	if (argc > 1) {
 		for (int i = 1; i < argc; i++) {
 			if (strcmp(argv[i], "--clean") == 0) {
 				clean_enabled = true;
+			} else if (strcmp(argv[i], "--lex") == 0) {
+				lex_enabled = true;
 			} else {
 				cout << "Unknown argument: " << argv[i] << '\n';
 				return EXIT_FAILURE;
@@ -251,9 +254,15 @@ int main(int argc, char *argv[])
 			exit_status = lex(tokens, token_group);
 		}
 		for (const Token& token : tokens) {
-			if (exit_status == EXIT_FAILURE)
-				break;
-			exit_status = parse(state, token, clean_enabled);
+			if (lex_enabled) {
+				cout << ' ' << token.getStr();
+			} else {
+				if (exit_status == EXIT_FAILURE)
+					break;
+				exit_status = parse(state, token, clean_enabled);
+			}
 		}
+		if (lex_enabled)
+			cout << '\n';
 	}
 }
