@@ -342,7 +342,7 @@ function run_tests
 	fi
 
 	echo "Starting testing"
-	time (
+	time {
 		# Syntactic tests
 		test_time_formats
 		test_commands
@@ -352,21 +352,27 @@ function run_tests
 		echo "Done"
 		echo
 		echo -n "Testing times:"
-	)
+	}
 	echo
 	echo "Results:"
 	echo "--------"
 	echo "PASS: $PASS_COUNT"
 	echo "FAIL: $FAIL_COUNT"
-	if [ "$FAIL_COUNT" -eq 0 ]; then
-		PERCENT=100
-	elif [ "$PASS_COUNT" -eq 0 ]; then
-		PERCENT=0
+	if [ "$FAIL_COUNT" -ne 0 ] || [ "$PASS_COUNT" -ne 0 ]; then
+		if [ "$FAIL_COUNT" -eq 0 ]; then
+			PERCENT=100
+		elif [ "$PASS_COUNT" -eq 0 ]; then
+			PERCENT=0
+		else
+			PERCENT="$(( 10000*$PASS_COUNT / ($PASS_COUNT+$FAIL_COUNT) ))"
+			PERCENT="${PERCENT:0:-2}.${PERCENT: -2}"
+		fi
+
+		echo "$PERCENT% passing"
 	else
-		PERCENT="$(( 10000*$PASS_COUNT / ($PASS_COUNT+$FAIL_COUNT) ))"
-		PERCENT="${PERCENT:0:-2}.${PERCENT: -2}"
+		echo -e "[\e[31m ERROR \e[39m] No tests run, or no results counted"
+		exit 1
 	fi
-	echo "$PERCENT% passing"
 }
 
 run_tests $@
