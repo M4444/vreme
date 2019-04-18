@@ -12,6 +12,48 @@ function output
 	fi
 }
 
+declare -a GOOD_TIME_FORMATS=(
+	"0"
+	"0h" "1h" "10h" "100h"
+	"0m" "1m" "10m" "100m"
+	"0:0" "0:00" "0:01" "0:30" "1:30" "10:30" "100:30"
+	"0/0" "0/00" "0/01" "0/30" "1/30" "10/30" "100/30"
+	      "0.0"  "0.1"  "0.5"  "1.5"  "10.5"  "100.5"
+	      "0.00" "0.10" "0.50" "1.50" "10.50" "100.50"
+	".0" ".5" ".50" ".01" ".02" ".11" ".12" ".98" ".99"
+	"now"
+)
+
+declare -a GOOD_TIME_VALUES=(
+	"00:00"
+	"00:00" "01:00" "10:00" "100:00"
+	"00:00" "00:01" "00:10" "01:40"
+	"00:00" "00:00" "00:01" "00:30" "01:30" "10:30" "100:30"
+	"00:00" "00:00" "00:01" "00:30" "01:30" "10:30" "100:30"
+	        "00:00" "00:06" "00:30" "01:30" "10:30" "100:30"
+	        "00:00" "00:06" "00:30" "01:30" "10:30" "100:30"
+	"00:00" "00:30" "00:30" "00:01" "00:01" "00:07" "00:07" "00:59" "00:59"
+)
+
+declare -a BAD_TIME_FORMATS=(
+	"1" "10" "100"
+	"h" "10hour" "10hours" "10 h" "10 hour" "10 hours"
+	"m" "10min" "10minutes" "10 m" "10 min" "10 minutes"
+	"10/60" "/" "/0" "/30" "0/" "10/" "100/" "10/3" "10/300"
+	"10:60" ":" ":0" ":30" "0:" "10:" "100:" "10:3" "10:300"
+	"." "0." "10." "100." "0.500" "1.500" "10.500" "100.500" ".500"
+	"Now"
+)
+
+declare -a GOOD_COMMAND_FORMATS=(
+	"clear" "help" "exit"
+)
+
+declare -a BAD_COMMAND_FORMATS=(
+	"Clear" "Help" "Exit"
+	"quit" "Quit"
+)
+
 # $1 = expectation
 # ${@:2} = input
 function expect_any
@@ -44,164 +86,22 @@ function test_time_formats
 {
 	output "Testing GOOD time formats:"
 	output "--------------------------"
-	expect_success	""
-	expect_success	"0"
-	expect_success	"0h"
-	expect_success	"1h"
-	expect_success	"10h"
-	expect_success	"100h"
-	expect_success	"0m"
-	expect_success	"1m"
-	expect_success	"10m"
-	expect_success	"100m"
-	expect_success	"0:0"
-	expect_success	"0:00"
-	expect_success	"0:01"
-	expect_success	"0:30"
-	expect_success	"1:30"
-	expect_success	"10:30"
-	expect_success	"100:30"
-	expect_success	"0/0"
-	expect_success	"0/00"
-	expect_success	"0/01"
-	expect_success	"0/30"
-	expect_success	"1/30"
-	expect_success	"10/30"
-	expect_success	"100/30"
-	expect_success	"0.0"
-	expect_success	"0.5"
-	expect_success	"1.5"
-	expect_success	"10.5"
-	expect_success	"100.5"
-	expect_success	"0.00"
-	expect_success	"0.50"
-	expect_success	"1.50"
-	expect_success	"10.50"
-	expect_success	"100.50"
-	expect_success	".0"
-	expect_success	".5"
-	expect_success	".50"
-	expect_success	".01"
-	expect_success	".02"
-	expect_success	".11"
-	expect_success	".12"
-	expect_success	".98"
-	expect_success	".99"
-	expect_success	"now"
+	for time_format in "${GOOD_TIME_FORMATS[@]}"; do
+		expect_success "$time_format"
+	done
 	output "Testing BAD time formats:"
 	output "-------------------------"
-	expect_failure	"1"
-	expect_failure	"10"
-	expect_failure	"100"
-	expect_failure	"h"
-	expect_failure	"10hour"
-	expect_failure	"10hours"
-	expect_failure	"10 h"
-	expect_failure	"10 hour"
-	expect_failure	"10 hours"
-	expect_failure	"m"
-	expect_failure	"10min"
-	expect_failure	"10minutes"
-	expect_failure	"10 m"
-	expect_failure	"10 min"
-	expect_failure	"10 minutes"
-	expect_failure	"10/60"
-	expect_failure	"/"
-	expect_failure	"/0"
-	expect_failure	"/30"
-	expect_failure	"0/"
-	expect_failure	"10/"
-	expect_failure	"100/"
-	expect_failure	"10/3"
-	expect_failure	"10/300"
-	expect_failure	"10:60"
-	expect_failure	":"
-	expect_failure	":0"
-	expect_failure	":30"
-	expect_failure	"0:"
-	expect_failure	"10:"
-	expect_failure	"100:"
-	expect_failure	"10:3"
-	expect_failure	"10:300"
-	expect_failure	"."
-	expect_failure	"0."
-	expect_failure	"10."
-	expect_failure	"100."
-	expect_failure	"0.500"
-	expect_failure	"1.500"
-	expect_failure	"10.500"
-	expect_failure	"100.500"
-	expect_failure	".500"
-	expect_failure	"Now"
+	for time_format in "${BAD_TIME_FORMATS[@]}"; do
+		expect_failure "$time_format"
+	done
 	# Trailing characters
-	expect_failure	"X"
-	expect_failure	"0X"
-	expect_failure	"0hX"
-	expect_failure	"1hX"
-	expect_failure	"10hX"
-	expect_failure	"100hX"
-	expect_failure	"0mX"
-	expect_failure	"1mX"
-	expect_failure	"10mX"
-	expect_failure	"100mX"
-	expect_failure	"0:00X"
-	expect_failure	"0:30X"
-	expect_failure	"1:30X"
-	expect_failure	"10:30X"
-	expect_failure	"100:30X"
-	expect_failure	"0/00X"
-	expect_failure	"0/30X"
-	expect_failure	"1/30X"
-	expect_failure	"10/30X"
-	expect_failure	"100/30X"
-	expect_failure	"0.0X"
-	expect_failure	"0.5X"
-	expect_failure	"1.5X"
-	expect_failure	"10.5X"
-	expect_failure	"100.5X"
-	expect_failure	"0.00X"
-	expect_failure	"0.50X"
-	expect_failure	"1.50X"
-	expect_failure	"10.50X"
-	expect_failure	"100.50X"
-	expect_failure	".0X"
-	expect_failure	".5X"
-	expect_failure	".50X"
-	expect_failure	"nowX"
+	for time_format in "${GOOD_TIME_FORMATS[@]}"; do
+		expect_failure "${time_format}X"
+	done
 	# Leading characters
-	expect_failure	"X0"
-	expect_failure	"X0h"
-	expect_failure	"X1h"
-	expect_failure	"X10h"
-	expect_failure	"X100h"
-	expect_failure	"X0m"
-	expect_failure	"X1m"
-	expect_failure	"X10m"
-	expect_failure	"X100m"
-	expect_failure	"X0:00"
-	expect_failure	"X0:30"
-	expect_failure	"X1:30"
-	expect_failure	"X10:30"
-	expect_failure	"X100:30"
-	expect_failure	"X0/00"
-	expect_failure	"X0/30"
-	expect_failure	"X1/30"
-	expect_failure	"X10/30"
-	expect_failure	"X100/30"
-	expect_failure	"X0.0"
-	expect_failure	"X0.5"
-	expect_failure	"X1.5"
-	expect_failure	"X10.5"
-	expect_failure	"X100.5"
-	expect_failure	"X0.00"
-	expect_failure	"X0.50"
-	expect_failure	"X1.50"
-	expect_failure	"X10.50"
-	expect_failure	"X100.50"
-	expect_failure	"X.0"
-	expect_failure	"X.5"
-	expect_failure	"X.50"
-	expect_failure	"Xnow"
+	for time_format in "${GOOD_TIME_FORMATS[@]}"; do
+		expect_failure "X${time_format}"
+	done
 	output
 }
 
@@ -209,24 +109,22 @@ function test_commands
 {
 	output "Testing GOOD commands:"
 	output "----------------------"
-	expect_success	"clear"
-	expect_success	"help"
-	expect_success	"exit"
+	for command_format in "${GOOD_COMMAND_FORMATS[@]}"; do
+		expect_success "$command_format"
+	done
 	output "Testing BAD commands:"
 	output "---------------------"
-	expect_failure	"Clear"
-	expect_failure	"Help"
-	expect_failure	"Exit"
-	expect_failure	"quit"
-	expect_failure	"Quit"
+	for command_format in "${BAD_COMMAND_FORMATS[@]}"; do
+		expect_failure "$command_format"
+	done
 	# Trailing characters
-	expect_failure	"clearX"
-	expect_failure	"helpX"
-	expect_failure	"exitX"
+	for command_format in "${GOOD_COMMAND_FORMATS[@]}"; do
+		expect_failure "${command_format}X"
+	done
 	# Leading characters
-	expect_failure	"Xclear"
-	expect_failure	"Xhelp"
-	expect_failure	"Xexit"
+	for command_format in "${GOOD_COMMAND_FORMATS[@]}"; do
+		expect_failure "X${command_format}"
+	done
 	output
 }
 
@@ -289,49 +187,13 @@ function test_values
 {
 	output "Testing values"
 	output "--------------"
-	expect_equal	"0"		"00:00"
-	expect_equal	"0h"		"00:00"
-	expect_equal	"1h"		"01:00"
-	expect_equal	"10h"		"10:00"
-	expect_equal	"100h"		"100:00"
-	expect_equal	"0m"		"00:00"
-	expect_equal	"1m"		"00:01"
-	expect_equal	"10m"		"00:10"
-	expect_equal	"100m"		"01:40"
-	expect_equal	"0:0"		"00:00"
-	expect_equal	"0:00"		"00:00"
-	expect_equal	"0:01"		"00:01"
-	expect_equal	"0:30"		"00:30"
-	expect_equal	"1:30"		"01:30"
-	expect_equal	"10:30"		"10:30"
-	expect_equal	"100:30"	"100:30"
-	expect_equal	"0/0"		"00:00"
-	expect_equal	"0/00"		"00:00"
-	expect_equal	"0/01"		"00:01"
-	expect_equal	"0/30"		"00:30"
-	expect_equal	"1/30"		"01:30"
-	expect_equal	"10/30"		"10:30"
-	expect_equal	"100/30"	"100:30"
-	expect_equal	"0.0"		"00:00"
-	expect_equal	"0.5"		"00:30"
-	expect_equal	"1.5"		"01:30"
-	expect_equal	"10.5"		"10:30"
-	expect_equal	"100.5"		"100:30"
-	expect_equal	"0.00"		"00:00"
-	expect_equal	"0.50"		"00:30"
-	expect_equal	"1.50"		"01:30"
-	expect_equal	"10.50"		"10:30"
-	expect_equal	"100.50"	"100:30"
-	expect_equal	".0"		"00:00"
-	expect_equal	".5"		"00:30"
-	expect_equal	".50"		"00:30"
-	expect_equal	".01"		"00:01"
-	expect_equal	".02"		"00:01"
-	expect_equal	".11"		"00:07"
-	expect_equal	".12"		"00:07"
-	expect_equal	".98"		"00:59"
-	expect_equal	".99"		"00:59"
-	test_now
+	for (( i = 0; i < "${#GOOD_TIME_FORMATS[@]}"; i++ )); do
+		if [[ ${GOOD_TIME_FORMATS[i]} != "now" ]]; then
+			expect_equal "${GOOD_TIME_FORMATS[i]}" "${GOOD_TIME_VALUES[i]}"
+		else
+			test_now
+		fi
+	done
 	output
 }
 
