@@ -270,7 +270,7 @@ int main(int argc, char *argv[])
 				exit_status = parse(state, token);
 			}
 		}
-		if (lex_enabled)
+		if (lex_enabled && !tokens.empty())
 			cout << '\n';
 	}
 }
