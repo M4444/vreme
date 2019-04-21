@@ -10,6 +10,7 @@
 #include <cmath>
 #include <ctime>
 #include <iomanip>
+#include <sstream>
 #include <string>
 
 using namespace std;
