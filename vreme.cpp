@@ -16,6 +16,21 @@
 
 using namespace std;
 
+struct ErrorOutput
+{
+	bool clean_enabled = false;
+
+	template <typename T>
+	ErrorOutput& operator<<(const T& obj)
+	{
+		if (!clean_enabled)
+			cerr << obj;
+		return *this;
+	}
+};
+
+ErrorOutput error_output;
+
 inline string Bold(const string& text)
 {
 	return "\033[1m" + text + "\033[0m";
@@ -82,9 +97,9 @@ int insertAndCheckToken(vector<Token>& tokens, const string& token_string)
 		tokens.emplace_back(token_string, type);
 		return EXIT_SUCCESS;
 	} else {
-		cout << "* Error: Unknown format" << '\n';
-		cout << print_format_help;
-		cout << "* Try '" << Bold("help") << "' for more info" << '\n';
+		error_output << "* Error: Unknown format" << '\n';
+		error_output << print_format_help;
+		error_output << "* Try '" << Bold("help") << "' for more info" << '\n';
 		return EXIT_FAILURE;
 	}
 }
@@ -130,7 +145,7 @@ struct State {
 	char operation;
 };
 
-int parse(State& state, const Token& token, const bool clean_enabled)
+int parse(State& state, const Token& token)
 {
 	switch (token.getType()) {
 	case COMMAND:
@@ -158,12 +173,10 @@ int parse(State& state, const Token& token, const bool clean_enabled)
 		break;
 	case TIME:
 		if (state.expected_type == OP) {
-			if (!clean_enabled) {
-				cout << "* Error: Operation not specified" << '\n';
-				cout << "After a time an operation needs to be specified next" << '\n';
-				cout << print_operation_help;
-				cout << "* Try '" << Bold("help") << "' for more info" << '\n';
-			}
+			error_output << "* Error: Operation not specified" << '\n';
+			error_output << "After a time an operation needs to be specified next" << '\n';
+			error_output << print_operation_help;
+			error_output << "* Try '" << Bold("help") << "' for more info" << '\n';
 			return EXIT_FAILURE;
 		} else {
 			switch (state.operation) {
@@ -184,12 +197,10 @@ int parse(State& state, const Token& token, const bool clean_enabled)
 		break;
 	case OP:
 		if (state.expected_type == TIME) {
-			if (!clean_enabled) {
-				cout << "* Error: Time not specified" << '\n';
-				cout << "After an operation time needs to be specified next" << '\n';
-				cout << print_format_help;
-				cout << "* Try '" << Bold("help") << "' for more info" << '\n';
-			}
+			error_output << "* Error: Time not specified" << '\n';
+			error_output << "After an operation time needs to be specified next" << '\n';
+			error_output << print_format_help;
+			error_output << "* Try '" << Bold("help") << "' for more info" << '\n';
 			return EXIT_FAILURE;
 		} else {
 			state.operation = token.getStr()[0];
@@ -199,11 +210,9 @@ int parse(State& state, const Token& token, const bool clean_enabled)
 		break;
 	case NONE:
 		// Lexer handles this case so this should be unreachable
-		if (!clean_enabled) {
-			cout << "* Error: Unknown format" << '\n';
-			cout << print_format_help;
-			cout << "* Try '" << Bold("help") << "' for more info" << '\n';
-		}
+		error_output << "* Error: Unknown format" << '\n';
+		error_output << print_format_help;
+		error_output << "* Try '" << Bold("help") << "' for more info" << '\n';
 		return EXIT_FAILURE;
 		break;
 	}
@@ -212,23 +221,22 @@ int parse(State& state, const Token& token, const bool clean_enabled)
 
 int main(int argc, char *argv[])
 {
-	bool clean_enabled = false;
 	bool lex_enabled = false;
 
 	if (argc > 1) {
 		for (int i = 1; i < argc; i++) {
 			if (strcmp(argv[i], "--clean") == 0) {
-				clean_enabled = true;
+				error_output.clean_enabled = true;
 			} else if (strcmp(argv[i], "--lex") == 0) {
 				lex_enabled = true;
 			} else {
-				cout << "Unknown argument: " << argv[i] << '\n';
+				error_output << "Unknown argument: " << argv[i] << '\n';
 				return EXIT_FAILURE;
 			}
 		}
 	}
 
-	if (!clean_enabled)
+	if (!error_output.clean_enabled)
 		cout << "Time calculation:" << '\n';
 
 	int exit_status = EXIT_SUCCESS;
@@ -259,7 +267,7 @@ int main(int argc, char *argv[])
 			} else {
 				if (exit_status == EXIT_FAILURE)
 					break;
-				exit_status = parse(state, token, clean_enabled);
+				exit_status = parse(state, token);
 			}
 		}
 		if (lex_enabled)
