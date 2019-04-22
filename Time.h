@@ -15,8 +15,7 @@
 
 using namespace std;
 
-class Time
-{
+class Time {
 private:
 	int m = 0;
 public:

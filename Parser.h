@@ -16,8 +16,7 @@
 
 using namespace std;
 
-class Parser
-{
+class Parser {
 private:
 	TOKEN_TYPE expected_type = TIME;
 	int step_counter = 0;

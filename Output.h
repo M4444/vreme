@@ -12,8 +12,7 @@
 
 using namespace std;
 
-struct ErrorOutput
-{
+struct ErrorOutput {
 	bool clean_enabled = false;
 
 	template <typename T>
