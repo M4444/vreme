@@ -178,10 +178,8 @@ ostream& operator<<(ostream& os, const Time& time)
 {
 	if (time.isNegative())
 		os << '-';
-	os << setfill('0') << setw(2)
-	   << time.getH() << ':'
-	   << setfill('0') << setw(2)
-	   << time.getM();
+	os << setfill('0') << setw(2) << time.getH() << ':'
+	   << setfill('0') << setw(2) << time.getM();
 
 	return os;
 }

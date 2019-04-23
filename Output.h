@@ -35,7 +35,8 @@ inline ostream& print_format_help(ostream& os)
 {
 	os << "Possible " << Bold("time") << " formats: "
 	   << Bold("now, X:X, X/X, X.X, Xh, Xm") << '\n';
-	os << "Example of equal " << Bold("time") << ": 4:45 = 4/45 = 4.75 = 4h + 45m" << '\n';
+	os << "Example of equal " << Bold("time")
+	   << ": 4:45 = 4/45 = 4.75 = 4h + 45m" << '\n';
 	return os;
 }
 
