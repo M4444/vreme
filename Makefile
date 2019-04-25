@@ -9,10 +9,10 @@ vreme: vreme.o
 vreme.o: Output.h Parser.h Time.h Token.h
 
 test: vreme
-	@./test.sh; /bin/true
+	@./test.sh
 
 test-all: vreme
-	@./test.sh --all; /bin/true
+	@./test.sh --all
 
 clean:
 	rm -f vreme.o vreme

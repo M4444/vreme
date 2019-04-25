@@ -5,12 +5,7 @@ FAIL_COUNT=0
 
 PRINT_ALL=0
 
-function output
-{
-	if [ "$PRINT_ALL" -eq 1 ]; then
-		echo $@
-	fi
-}
+#============================== Test arrays ===================================#
 
 declare -a GOOD_TIME_FORMATS=(
 	"0"
@@ -54,6 +49,14 @@ declare -a BAD_COMMAND_FORMATS=(
 	"quit" "Quit"
 )
 
+#============================== Helper functions ==============================#
+function output
+{
+	if [ "$PRINT_ALL" -eq 1 ]; then
+		echo $@
+	fi
+}
+
 # $1 = expectation
 # ${@:2} = input
 function expect_any
@@ -82,6 +85,25 @@ function expect_failure
 	expect_any 1 "$@"
 }
 
+# $1 = input
+# $2 = expected output
+# $3 = result of the calculation
+function expect_equal
+{
+	if [[ "$3" == "$2" ]]; then
+		if [ "$PRINT_ALL" -eq 1 ]; then
+			echo -e "[\e[32m PASS \e[39m] $1 => $2"
+		fi
+		((PASS_COUNT++))
+	else
+		echo -e "[\e[31m FAIL \e[39m] $1 => $2"
+		echo "Result:  $1 => $3 is incorrect"
+		echo
+		((FAIL_COUNT++))
+	fi
+}
+
+#============================== Testing functions =============================#
 function test_time_formats
 {
 	output "Testing GOOD time formats:"
@@ -126,22 +148,6 @@ function test_commands
 		expect_failure "X${command_format}"
 	done
 	output
-}
-
-function expect_equal
-{
-	RESULT=$(echo $1 | ./vreme --clean | cut -c4-)
-	if [[ "$RESULT" == "$2" ]]; then
-		if [ "$PRINT_ALL" -eq 1 ]; then
-			echo -e "[\e[32m PASS \e[39m] $1 => $2"
-		fi
-		((PASS_COUNT++))
-	else
-		echo -e "[\e[31m FAIL \e[39m] $1 => $2"
-		echo "Result:  $1 => $RESULT is incorrect"
-		echo
-		((FAIL_COUNT++))
-	fi
 }
 
 function test_now
@@ -189,7 +195,8 @@ function test_values
 	output "--------------"
 	for (( i = 0; i < "${#GOOD_TIME_FORMATS[@]}"; i++ )); do
 		if [[ ${GOOD_TIME_FORMATS[i]} != "now" ]]; then
-			expect_equal "${GOOD_TIME_FORMATS[i]}" "${GOOD_TIME_VALUES[i]}"
+			RESULT=$(echo "${GOOD_TIME_FORMATS[i]}" | ./vreme --clean | cut -c4-)
+			expect_equal "${GOOD_TIME_FORMATS[i]}" "${GOOD_TIME_VALUES[i]}" "$RESULT"
 		else
 			test_now
 		fi
@@ -197,6 +204,7 @@ function test_values
 	output
 }
 
+#============================== Main test runner ==============================#
 function run_tests
 {
 	if [[ "$1" == "--all" ]]; then
