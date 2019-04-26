@@ -1,11 +1,23 @@
 #!/bin/bash
-
 PASS_COUNT=0
 FAIL_COUNT=0
 
 PRINT_ALL=0
 
 #============================== Test arrays ===================================#
+declare -a GOOD_SYNTAX=(
+	 ""  "+"  "+0"  "+0+"  "+0+0" "+0+0+"
+	"0" "0+" "0+0" "0+0+" "0+0+0"
+	"++" "+++"
+	"0 +	0"
+)
+
+declare -a GOOD_SYNTAX_EXPECTED=(
+	  ""   " +"   " + 0"   " + 0 +"   " + 0 + 0" " + 0 + 0 +"
+	" 0" " 0 +" " 0 + 0" " 0 + 0 +" " 0 + 0 + 0"
+	" + +" " + + +"
+	" 0 + 0"
+)
 
 declare -a GOOD_TIME_FORMATS=(
 	"0"
@@ -104,6 +116,17 @@ function expect_equal
 }
 
 #============================== Testing functions =============================#
+function test_lexer
+{
+	output "Testing lexer"
+	output "-------------"
+	for (( i = 0; i < "${#GOOD_SYNTAX[@]}"; i++ )); do
+		RESULT=$(echo "${GOOD_SYNTAX[i]}" | ./vreme --lex --clean)
+		expect_equal "${GOOD_SYNTAX[i]}" "${GOOD_SYNTAX_EXPECTED[i]}" "$RESULT"
+	done
+	output
+}
+
 function test_time_formats
 {
 	output "Testing GOOD time formats:"
@@ -214,6 +237,7 @@ function run_tests
 	echo "Starting testing"
 	time {
 		# Syntactic tests
+		test_lexer
 		test_time_formats
 		test_commands
 		# Semantic tests
